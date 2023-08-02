@@ -10,6 +10,7 @@ GET_ADDRESS_TEXT = "Введи адрес для доставки или отп�
 BACK_TEXT = 'назад'
 
 PICKUP_TEXT = 'самовывоз'
+DELIVERY_TEXT = 'доставка'
 SELECT_SHOP_ADDRESSES_TEXT = "Выбери место самовывоза"
 BALLS_TEXT = "Сколько баллов использовать? (напиши целое число)"
 INCORRECT_INPUT_NUM_TEXT = "введи целое число от 0 до {}"
@@ -26,26 +27,15 @@ DELIVERY_ZONE_URL = 'https://yandex.ru/maps/?um=constructor' \
 ORDER_COMPLETED_TEXT = "Заказ на сумму {} {} принят, приятного аппетита!"
 
 
-def get_order_text(db: DataBase, tg_id: int, phone: str, delivery, balls: int = None, address: str = None,
-                   pickup=False):
-    delivery_none = False
-    text, price = get_profile_text(db, tg_id)
-    if delivery[0] is None and not pickup:
-        text += '\n' + delivery[1]
-        delivery_none = True
-    if not pickup and delivery[0] and delivery[0] > 0:
-        price += delivery[0]
-        text += f'доставка - {delivery[0]}RUB\n'
-    if not delivery_none:
-        text += f'---------------\n' \
-                f'Сумма: {price}RUB'
-        if balls:
-            price = max(1, price - balls)
-            text += f'\nиспользованные баллы - {balls}\n' \
-                    f'Итого: {price}RUB'
-        text += f'\n\nномер: {phone}'
-    if address is not None:
-        text += f'\nадрес: {address}'
-        if pickup:
-            text += ' (самовывоз)'
+def get_order_text(db: DataBase, tg_id: int, balls: int, pickup_address: str):
+    text, price = get_profile_text(db, tg_id, False)
+    if balls:
+        price = max(1, price - balls)
+        text += f'использованные баллы - {balls}\n'
+
+    text += f'---------------\n'
+    text += f'Итого: {price}RUB\n'
+    if pickup_address:
+        text += f'\nСамовывоз: {pickup_address}'
+
     return text

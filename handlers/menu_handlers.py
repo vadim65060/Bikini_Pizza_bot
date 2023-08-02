@@ -56,8 +56,6 @@ async def show_profile(message: types.Message):
     text, price = menu_texts.get_profile_text(data_base, message.from_user.id)
     markup = None
     if price:
-        text += f'---------------\n' \
-                f'Итого: {price}р'
         markup = menu_markups.start_order_markup
     else:
         text += '\nКорзина пуста'

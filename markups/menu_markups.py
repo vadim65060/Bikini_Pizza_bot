@@ -17,7 +17,8 @@ help_markup = ReplyKeyboardMarkup(resize_keyboard=True).add(menu_texts.HELP_BUTT
     menu_texts.BACK_BUTTON_TEXT)
 
 start_order_markup = InlineKeyboardMarkup().add(
-    InlineKeyboardButton(menu_texts.ORDER_TEXT, callback_data=menu_callbacks.ORDER_CB))
+    InlineKeyboardButton(menu_texts.ORDER_TEXT, callback_data=menu_callbacks.ORDER_CB),
+    InlineKeyboardButton(menu_texts.BASKET_EDIT_TEXT, callback_data=menu_callbacks.BASKET_EDIT_CB))
 
 
 def get_schedule_markup(events_summary):

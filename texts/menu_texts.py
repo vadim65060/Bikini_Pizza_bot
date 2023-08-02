@@ -25,9 +25,10 @@ PROFILE_TEMPLATE = "Баланс: {}\n"
 PROFILE_ERROR = "Произошла ошибка - тебя нет в базе данных"
 
 ORDER_TEXT = "Заказать"
+BASKET_EDIT_TEXT = "Редактировать"
 
 
-def get_profile_text(db: DataBase, tg_id):
+def get_profile_text(db: DataBase, tg_id, print_sum=True):
     info = db.get_user_info(tg_id, "money")
     if not info:
         return PROFILE_ERROR, 0
@@ -42,9 +43,11 @@ def get_profile_text(db: DataBase, tg_id):
         text += f"{name}"
         if size:
             text += f" {size}"
-        text += f" {count} шт - {price * count}RUB\n"
+        text += f" {count}шт - {price * count}RUB\n"
         total_price += price * count
-
+    if print_sum:
+        text += f'---------------\n' \
+                f'Итого: {total_price}р'
     return text, total_price
 
 
