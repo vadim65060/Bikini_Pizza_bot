@@ -117,13 +117,36 @@ async def shipping_callback(query: ShippingQuery, state: FSMContext) -> None:
         return
 
     options = list()
-    options.append(ShippingOption('1', 'Доствка курьером', [LabeledPrice('Доставка', delivery_price * 100)]))
+    options.append(ShippingOption('1', 'Доставка курьером', [LabeledPrice('Доставка', delivery_price * 100)]))
     await query.bot.answer_shipping_query(query.id, ok=True, shipping_options=options)
 
 
 @dp.pre_checkout_query_handler(lambda query: True, state='*')
-async def pre_checkout_query(pre_checkout_q: types.PreCheckoutQuery):
-    await pre_checkout_q.bot.answer_pre_checkout_query(pre_checkout_q.id, ok=True)
+async def pre_checkout_query(pre_checkout_q: types.PreCheckoutQuery, state: FSMContext):
+    data = await state.get_data()
+    balls = data.get('balls')
+    if balls:
+        user_balance, = db.get_user_info(pre_checkout_q.from_user.id, 'money')
+        if user_balance < balls:
+            await pre_checkout_q.bot.answer_pre_checkout_query(pre_checkout_q.id, ok=False,
+                                                               error_message='не хватает баллов на счету')
+    stuff_ids = db.get_purchases_by_id(pre_checkout_q.from_user.id, 'stuff_id')
+    ids = []
+    for stuff_id in stuff_ids:
+        ids.append(stuff_id[0])
+    stuff_show = db.get_stuff_info_by_id_array(ids, 'id, show')
+    delete_flag = False
+    for stuff in stuff_show:
+        if not stuff[1]:
+            db.delete_user_purchase(pre_checkout_q.from_user.id, stuff[0])
+            delete_flag = True
+
+    if delete_flag:
+        await pre_checkout_q.bot.answer_pre_checkout_query(pre_checkout_q.id, ok=False,
+                                                           error_message='некоторые товары отсутствуют, '
+                                                                         'оформите заказ заново')
+    else:
+        await pre_checkout_q.bot.answer_pre_checkout_query(pre_checkout_q.id, ok=True)
 
 
 async def successful_payment(message: Message, state: FSMContext):

@@ -337,8 +337,25 @@ class DataBase:
     def get_stuff_info(self, stuff_id, what: str):
         return self.execute("SELECT " + what + " FROM stuff WHERE id = ?", stuff_id, fetch="one")
 
+    def get_stuff_info_by_id_array(self, stuff_id_array: list[int], what: str):
+        ttt = f"SELECT {what} FROM stuff WHERE id IN {stuff_id_array}".replace('[', '(').replace(']', ')')
+        return self.execute(ttt, fetch=True)
+
     def get_stuff_info_by_name(self, stuff_name: str, what: str):
         return self.execute("SELECT " + what + " FROM stuff WHERE name = ?", stuff_name, fetch="one")
+
+    def delete_user_purchase(self, tg_id: int, staff_id: int, count: int | None = None):
+        if count is None:
+            self.execute(f"DELETE FROM purchases WHERE tg_id = ? AND stuff_id = ?", tg_id, staff_id, commit=True)
+            return
+
+        staff_count, = self.execute(f"SELECT count FROM purchases WHERE tg_id = ? AND stuff_id = ?", tg_id, staff_id,
+                                    fetch='ONE')
+        if staff_count > count:
+            self.execute(f"UPDATE purchases SET count = count - ? WHERE tg_id = ? AND stuff_id = ?", count, tg_id,
+                         staff_id, commit=True)
+        else:
+            self.execute(f"DELETE FROM purchases WHERE tg_id = ? AND stuff_id = ?", tg_id, staff_id, commit=True)
 
     # def get_user_info_by_code(self, code: str, what: str):
     #     return self.execute("SELECT " + what + " FROM users WHERE enter_code = ?", code, fetch="one")
