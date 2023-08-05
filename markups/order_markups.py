@@ -20,6 +20,7 @@ def get_order_markup(pickup):
 
     order_markup = InlineKeyboardMarkup()
     order_markup.add(InlineKeyboardButton(order_texts.USE_BALLS_BUTTON_TEXT, callback_data=order_callbacks.USE_BALL_CB),
+                     InlineKeyboardButton(order_texts.ADD_COMMENT_TEXT, callback_data=order_callbacks.ADD_COMMENT_CB),
                      InlineKeyboardButton(order_texts.CANCEL_BUTTON_TEXT, callback_data=order_callbacks.CANCEL_CB))
     order_markup.add(InlineKeyboardButton(order_texts.DELIVERY_ZONE_BUTTON_TEXT, url=order_texts.DELIVERY_ZONE_URL),
                      delivery_button)

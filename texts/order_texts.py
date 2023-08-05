@@ -14,12 +14,14 @@ DELIVERY_TEXT = 'доставка'
 SELECT_SHOP_ADDRESSES_TEXT = "Выбери место самовывоза"
 BALLS_TEXT = "Сколько баллов использовать? (напиши целое число)"
 INCORRECT_INPUT_NUM_TEXT = "введи целое число от 0 до {}"
+GET_COMMENT_TEXT = 'введи комментарий'
 
 EDIT_PHONE_BUTTON_TEXT = 'изменить номер'
 EDIT_ADDRESS_BUTTON_TEXT = 'изменить адресс'
 ORDER_BUTTON_TEXT = 'заказать'
 CANCEL_BUTTON_TEXT = 'отмена'
 USE_BALLS_BUTTON_TEXT = 'использовать баллы'
+ADD_COMMENT_TEXT = 'добавить комментарий'
 DELIVERY_ZONE_BUTTON_TEXT = 'Зоны доставки'
 DELIVERY_ZONE_URL = 'https://yandex.ru/maps/?um=constructor' \
                     '%3A38e7ac5af51607ab4e996b58fe775240204ebf377075397488c961da2eae134d&source=constructorLink'
@@ -27,7 +29,7 @@ DELIVERY_ZONE_URL = 'https://yandex.ru/maps/?um=constructor' \
 ORDER_COMPLETED_TEXT = "Заказ на сумму {} {} принят, приятного аппетита!"
 
 
-def get_order_text(db: DataBase, tg_id: int, balls: int, pickup_address: str):
+def get_order_text(db: DataBase, tg_id: int, balls: int, pickup_address: str, comment: str | None):
     text, price = get_profile_text(db, tg_id, False)
     if balls:
         price = max(1, price - balls)
@@ -37,5 +39,8 @@ def get_order_text(db: DataBase, tg_id: int, balls: int, pickup_address: str):
     text += f'Итого: {price}RUB\n'
     if pickup_address:
         text += f'\nСамовывоз: {pickup_address}'
+
+    if comment:
+        text += f'\nКомментарий: {comment}'
 
     return text

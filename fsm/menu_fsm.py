@@ -15,8 +15,7 @@ class LetteringState(StatesGroup):
 
 
 class OrderState(StatesGroup):
-    get_phone_number = State()
-    get_address = State()
+    get_comment = State()
     select_pickup_address = State()
     balls_select = State()
     print_order = State()

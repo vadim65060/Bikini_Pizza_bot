@@ -1,8 +1,6 @@
-import phonenumbers
 from aiogram import types
 from aiogram.dispatcher import FSMContext, filters
-from aiogram.types import Message, Location, CallbackQuery, ParseMode, ContentTypes, ContentType, Update, \
-    ShippingOption, LabeledPrice, ShippingQuery
+from aiogram.types import Message, CallbackQuery, ParseMode, ContentType, ShippingOption, LabeledPrice, ShippingQuery
 from aiogram.utils.callback_data import CallbackData
 from validator_collection import checkers
 
@@ -16,6 +14,7 @@ from handlers.menu_handlers import send_menu_on_update
 from markups import order_markups
 from markups.menu_markups import menu_markup
 from texts import order_texts
+from handlers import order_escort_handlers
 
 BUY_PAYLOAD = 'buy_payload'
 
@@ -34,12 +33,8 @@ async def back_to_menu(update: Message | CallbackQuery, state: FSMContext):
 
 
 async def order_start(callback: CallbackQuery, state: FSMContext):
-    last_order = db.get_last_user_order(callback.from_user.id, 'phone, address')
-    if last_order:
-        if db.is_shop(last_order[1]):
-            await state.update_data({'pickup': True})
     await callback.message.answer('Оформление заказа', reply_markup=order_markups.back_markup)
-    await select_state(callback.message, state, callback.from_user.id)
+    await print_order(callback.message, state, callback.from_user.id)
 
 
 async def select_pickup_address(callback: CallbackQuery, state: FSMContext):
@@ -50,12 +45,12 @@ async def select_pickup_address(callback: CallbackQuery, state: FSMContext):
 
 async def set_pickup_address(callback: CallbackQuery, state: FSMContext, callback_data: dict):
     await state.update_data({'pickup_address': db.get_shop_address(int(callback_data['shop_id']))[0]})
-    await select_state(callback, state, callback.from_user.id)
+    await print_order(callback, state, callback.from_user.id)
 
 
 async def off_pickup(callback: CallbackQuery, state: FSMContext):
     await state.update_data({'pickup_address': None})
-    await select_state(callback, state, callback.from_user.id)
+    await print_order(callback, state, callback.from_user.id)
 
 
 async def select_balls_to_use(callback: CallbackQuery, state: FSMContext):
@@ -76,6 +71,16 @@ async def set_balls_to_use(message: Message, state: FSMContext):
     await print_order(message, state)
 
 
+async def get_comment(callback: CallbackQuery, state: FSMContext):
+    await callback.answer(order_texts.GET_COMMENT_TEXT)
+    await OrderState.get_comment.set()
+
+
+async def set_comment(message: Message, state: FSMContext):
+    await state.update_data({'comment': message.text})
+    await print_order(message, state)
+
+
 async def buy(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     balls = data.get('balls')
@@ -83,7 +88,7 @@ async def buy(callback: CallbackQuery, state: FSMContext):
     booked_list = db.booked_list(callback.from_user.id)
     prices = []
     for staff in booked_list:
-        prices.append(types.LabeledPrice(label=f'{staff[2]} {staff[5]}шт.', amount=staff[3] * 100))
+        prices.append(types.LabeledPrice(label=f'{staff[2]} {staff[5]}шт.', amount=staff[3] * staff[5] * 100))
     if balls:
         prices.append(types.LabeledPrice(label=f'Баллы', amount=-balls * 100))
     await callback.bot.send_invoice(callback.message.chat.id,
@@ -118,11 +123,16 @@ async def shipping_callback(query: ShippingQuery, state: FSMContext) -> None:
 
     options = list()
     options.append(ShippingOption('1', 'Доставка курьером', [LabeledPrice('Доставка', delivery_price * 100)]))
+    await state.update_data({'delivery_cost': delivery_price})
     await query.bot.answer_shipping_query(query.id, ok=True, shipping_options=options)
 
 
 @dp.pre_checkout_query_handler(lambda query: True, state='*')
 async def pre_checkout_query(pre_checkout_q: types.PreCheckoutQuery, state: FSMContext):
+    if pre_checkout_q.invoice_payload != BUY_PAYLOAD:
+        await pre_checkout_q.bot.answer_pre_checkout_query(pre_checkout_q.id, ok=False,
+                                                           error_message="Something went wrong...")
+        return
     data = await state.get_data()
     balls = data.get('balls')
     if balls:
@@ -145,45 +155,48 @@ async def pre_checkout_query(pre_checkout_q: types.PreCheckoutQuery, state: FSMC
         await pre_checkout_q.bot.answer_pre_checkout_query(pre_checkout_q.id, ok=False,
                                                            error_message='некоторые товары отсутствуют, '
                                                                          'оформите заказ заново')
+        await pre_checkout_q.bot.delete_message(pre_checkout_q.from_user.id, pre_checkout_q.id)
     else:
         await pre_checkout_q.bot.answer_pre_checkout_query(pre_checkout_q.id, ok=True)
 
 
 async def successful_payment(message: Message, state: FSMContext):
-    await message.answer(order_texts.ORDER_COMPLETED_TEXT.format(message.successful_payment.total_amount // 100,
-                                                                 message.successful_payment.currency),
-                         reply_markup=menu_markup)
-
     data = await state.get_data()
     phone = message.successful_payment.order_info.phone_number
     shipping_address = message.successful_payment.order_info.shipping_address
     if shipping_address:
         address = f'{shipping_address.city} {shipping_address.street_line1} {shipping_address.street_line2}'
     else:
-        address = data.get('pickup_address')
+        address = data.get('pickup_address') + ' (самовывоз)'
     balls = data.get('balls')
-    db.checkout(message.from_user.id, message.successful_payment.total_amount // 100, balls, phone, address)
+    delivery_cost = data.get('delivery_cost')
+    if delivery_cost is None:
+        delivery_cost = 0
+    comment = data.get('comment')
+    order_id, = db.checkout(message.from_user.id, message.successful_payment.total_amount // 100, balls, delivery_cost,
+                            phone, address, comment)
+    await order_escort_handlers.print_order(order_id)
+    await message.answer(order_texts.ORDER_COMPLETED_TEXT.format(message.successful_payment.total_amount // 100,
+                                                                 message.successful_payment.currency),
+                         reply_markup=menu_markup)
     await state.finish()
 
 
 async def print_order(update: Message | CallbackQuery, state: FSMContext, user_id=None):
+    await OrderState.print_order.set()
     data = await state.get_data()
     pickup_address = data.get('pickup_address')
     balls = data.get('balls')
+    comment = data.get('comment')
     if user_id is None:
         user_id = update.from_user.id
-    text = order_texts.get_order_text(db, user_id, balls, pickup_address)
+    text = order_texts.get_order_text(db, user_id, balls, pickup_address, comment)
     if isinstance(update, CallbackQuery):
         await update.message.edit_text(text, reply_markup=order_markups.get_order_markup(pickup_address),
                                        parse_mode=ParseMode.HTML)
     else:
         await update.answer(text, reply_markup=order_markups.get_order_markup(pickup_address),
                             parse_mode=ParseMode.HTML)
-
-
-async def select_state(update: Message | CallbackQuery, state: FSMContext, user_id=None):
-    await print_order(update, state, user_id)
-    await OrderState.print_order.set()
 
 
 def register_order_handlers():
@@ -209,6 +222,11 @@ def register_order_handlers():
     dp.register_callback_query_handler(select_balls_to_use,
                                        CallbackData(order_callbacks.USE_BALL_CB).filter(),
                                        state=OrderState.print_order)
+    dp.register_callback_query_handler(get_comment,
+                                       CallbackData(order_callbacks.ADD_COMMENT_CB).filter(),
+                                       state=OrderState.print_order)
+    dp.register_message_handler(set_comment,
+                                state=OrderState.get_comment)
 
     dp.register_message_handler(set_balls_to_use,
                                 state=OrderState.balls_select)

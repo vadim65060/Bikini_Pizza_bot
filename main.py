@@ -4,7 +4,7 @@ import startup_functions
 from bot_create import dp
 from create_db import data_base
 from database.db_funcs import DataBase
-from handlers import registration_handlers, menu_handlers, store_handlers, order_handlers
+from handlers import registration_handlers, menu_handlers, store_handlers, order_handlers, order_escort_handlers
 from middleware import antispam, blacklist, admins
 
 
@@ -13,6 +13,7 @@ def users_bot_start(dp: Dispatcher, db: DataBase):
     store_handlers.register_store_handlers()
     registration_handlers.register_registration_handlers()
     order_handlers.register_order_handlers()
+    order_escort_handlers.register_order_escort_handlers()
     menu_handlers.register_menu_handlers()
     dp.middleware.setup(admins.AdminMalware(db))
     dp.middleware.setup(blacklist.BlacklistMiddleware(db))

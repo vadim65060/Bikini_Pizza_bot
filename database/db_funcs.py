@@ -119,11 +119,14 @@ class DataBase:
                             )""", commit=True)
         self.execute("""CREATE TABLE IF NOT EXISTS orders (
                                         id     INTEGER PRIMARY KEY AUTOINCREMENT,
-                                        user_id   INTEGER,
-                                        stuff_ids TEXT,
-                                        price     INTEGER,
-                                        phone     TEXT,
-                                        address   TEXT
+                                        user_id       INTEGER,
+                                        stuff_ids     TEXT,
+                                        price         INTEGER,
+                                        used_balls    INTEGER,
+                                        delivery_cost INTEGER,
+                                        phone         TEXT,
+                                        address       TEXT,
+                                        comment       TEXT
                                     )""", commit=True)
 
     def execute(self, clause: str, *args, commit: bool = False, fetch: Union[bool, str] = False) -> Union[list, None]:
@@ -216,17 +219,13 @@ class DataBase:
             res += count
         return res
 
-    def booked_list(self, tg_id: int):
+    def get_staff_list_info(self, staff_list: list):
         """
-
-        :param tg_id:
+        :param staff_list: [(stuff_id, stuff_sizes_id, count)]
         :return: [(stuff_id, stuff_sizes_id, name, price, size, count)]
         """
-        data = self.execute("SELECT stuff_id, stuff_sizes_id, count "
-                            "FROM purchases WHERE tg_id = ?",
-                            tg_id, fetch="ALL")
         res = []
-        for stuff_id, stuff_sizes_id, count in data:
+        for stuff_id, stuff_sizes_id, count in staff_list:
             name, price = self.get_stuff_info(stuff_id, "name, price")
             if stuff_sizes_id is not None:
                 price, size = self.get_stuff_sizes_texts_info(stuff_sizes_id, "price, size")
@@ -234,6 +233,23 @@ class DataBase:
                 size = None
             res.append((stuff_id, stuff_sizes_id, name, price, size, count))
         return res
+
+    def booked_list(self, tg_id: int):
+        """
+        :param tg_id:
+        :return: [(stuff_id, stuff_sizes_id, name, price, size, count)]
+        """
+        data = self.execute("SELECT stuff_id, stuff_sizes_id, count "
+                            "FROM purchases WHERE tg_id = ?",
+                            tg_id, fetch="ALL")
+        return self.get_staff_list_info(data)
+
+    def get_order_list(self, order_id):
+        """
+        :param order_id:
+        :return: [(stuff_id, stuff_sizes_id, name, price, size, count)]
+        """
+        return self.get_staff_list_info(self.parse_order_purchases(order_id))
 
     def get_stuff_count_num_by_stuff_id(self, stuff_id):
         """
@@ -644,21 +660,28 @@ class DataBase:
     def get_shop_address(self, shop_id: int):
         return self.execute("SELECT address FROM shops WHERE id = ? AND show = 1", shop_id, fetch='ONE')
 
-    def checkout(self, user_id: int, price: int, balls: int, phone: str, address: str):
+    def checkout(self, user_id: int, price: int, balls: int, delivery_cost: int, phone: str, address: str,
+                 comment: str):
         purchases_text = self.__purchases_to_text(user_id)
-        self.execute("INSERT INTO orders (user_id, stuff_ids, price, phone, address) VALUES (?, ?, ?, ?, ?)",
-                     user_id, purchases_text, price, phone, address, commit=True)
-        self.execute("DELETE FROM purchases WHERE tg_id = ?", user_id, commit=True)
+        self.execute(
+            "INSERT INTO orders (user_id, stuff_ids, price, used_balls, delivery_cost, phone, address, comment) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            user_id, purchases_text, price, balls, delivery_cost, phone, address, comment)
+        self.execute("DELETE FROM purchases WHERE tg_id = ?", user_id)
         if balls is None:
             balls = 0
         self.execute("UPDATE users SET money = money - ? + ? WHERE tg_id = ?", balls,
-                     int(price * constants.CASH_BACK_PERCENT), user_id, commit=True)
+                     int(price * constants.CASHBACK_PERCENT), user_id, commit=True)
+        return self.execute('SELECT MAX(id) FROM orders WHERE user_id = ?', user_id, fetch='ONE')
 
     def get_last_user_order(self, user_id: int, what: str):
         order = self.execute(f"SELECT {what} FROM orders WHERE user_id = ?", user_id, fetch=True)
         if not order:
             return None
         return order[-1]
+
+    def get_order_info(self, oder_id: int, what: str):
+        return self.execute(f"SELECT {what} FROM orders WHERE id = ?", oder_id, fetch='ONE')
 
     def __purchases_to_text(self, user_id: int):
         purchases = self.get_purchases_by_id(user_id, 'stuff_id, stuff_sizes_id, count')
@@ -667,7 +690,7 @@ class DataBase:
             purchases_text += f"{pur[0]}:{pur[1]}={pur[2]}, "
         return purchases_text[:-2]
 
-    def __parse_order_purchases(self, order_id: int):
+    def parse_order_purchases(self, order_id: int):
         """
 
         :param order_id:

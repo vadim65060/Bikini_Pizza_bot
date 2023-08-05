@@ -72,15 +72,15 @@ def get_thing_color_size_confirmation_text_markup(db: DataBase, colors_sizes_id)
 
 def get_thing_color_size_text_markup(db: DataBase, stuff_id, tg_id):
     data = db.get_stuff_info(stuff_id, "name, description, price, show")
+    markup = InlineKeyboardMarkup()
     if not data:
         text = THING_NOT_FOUND_TEXT
-        return text, None
+        return text, markup
     name, description, price, show = data
     if not show:
         text = THING_HID
-        return text, None
+        return text, markup
     combinations = db.get_all_size_combinations(stuff_id)
-    markup = InlineKeyboardMarkup()
     count = db.get_stuff_count_num_by_stuff_id(stuff_id)
 
     if not description:
@@ -124,13 +124,14 @@ def get_thing_color_size_text_markup(db: DataBase, stuff_id, tg_id):
 
 def get_thing_no_color_size_text_markup(db: DataBase, stuff_id, tg_id):
     data = db.get_stuff_info(stuff_id, "name, description, price, count, show")
+    markup = InlineKeyboardMarkup()
     if not data:
         text = "К сожалению, товар не найден."
-        return text, None
+        return text, markup
     name, description, price, count, show = data
     if not show:
         text = "Товар скрыт"
-        return text, None
+        return text, markup
     if not description:
         description = ""
     else:
@@ -140,7 +141,6 @@ def get_thing_no_color_size_text_markup(db: DataBase, stuff_id, tg_id):
     booked = db.how_many_stuff_booked(tg_id, stuff_id)
     if booked:
         text += f"\nВ корзине: {booked} шт."
-    markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("В корзину", callback_data=BUY_NO_COLORS_SIZES_CB.new(stuff_id=stuff_id)))
     return text, markup
 

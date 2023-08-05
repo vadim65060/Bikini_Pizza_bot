@@ -1,9 +1,6 @@
 # Тексты кнопок
-import collections
 
 from database.db_funcs import DataBase
-from functions import menu_functions
-import datetime as dt
 
 MENU_PROFILE_BUTTON_TEXT = "Корзина"
 MENU_STORE_BUTTON_TEXT = "Магазин"
@@ -47,7 +44,7 @@ def get_profile_text(db: DataBase, tg_id, print_sum=True):
         total_price += price * count
     if print_sum:
         text += f'---------------\n' \
-                f'Итого: {total_price}р'
+                f'Итого: {total_price}RUB'
     return text, total_price
 
 
