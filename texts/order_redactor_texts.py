@@ -1,0 +1,5 @@
+BASKET_EMPTY_TEXT = 'корзина пуста'
+STAFF_ADD_TEXT = '+1'
+STAFF_SUBTRACT_TEXT = '-1'
+BACK_TEXT = 'назад'
+

@@ -55,10 +55,8 @@ class DataBase:
                             tg_id                 INTEGER NOT NULL
                                                           REFERENCES users (tg_id),
                             stuff_id              INTEGER REFERENCES stuff (id),
-                            stuff_sizes_id INTEGER REFERENCES stuff_sizes (id),
+                            stuff_sizes_id        INTEGER REFERENCES stuff_sizes (id),
                             count                 INTEGER NOT NULL,
-                            issued                INTEGER DEFAULT (0) 
-                                  NOT NULL,
                             UNIQUE (
                                 tg_id,
                                 stuff_id,
@@ -360,18 +358,45 @@ class DataBase:
     def get_stuff_info_by_name(self, stuff_name: str, what: str):
         return self.execute("SELECT " + what + " FROM stuff WHERE name = ?", stuff_name, fetch="one")
 
-    def delete_user_purchase(self, tg_id: int, staff_id: int, count: int | None = None):
+    def delete_user_purchase(self, tg_id: int, staff_id: int, size_id: int | None = None, count: int | None = None):
+        select_size = ''
+        if size_id is not None:
+            select_size = f' AND size_id = {size_id}'
         if count is None:
-            self.execute(f"DELETE FROM purchases WHERE tg_id = ? AND stuff_id = ?", tg_id, staff_id, commit=True)
+            self.execute("DELETE FROM purchases WHERE tg_id = ? AND stuff_id = ?{}".format(select_size), tg_id,
+                         staff_id, commit=True)
             return
 
-        staff_count, = self.execute(f"SELECT count FROM purchases WHERE tg_id = ? AND stuff_id = ?", tg_id, staff_id,
-                                    fetch='ONE')
+        staff_count = self.execute("SELECT count FROM purchases WHERE tg_id = ? AND stuff_id = ?".format(select_size),
+                                   tg_id, staff_id,
+                                   fetch='ONE')
+        if staff_count is None:
+            return
+
+        staff_count, = staff_count
         if staff_count > count:
-            self.execute(f"UPDATE purchases SET count = count - ? WHERE tg_id = ? AND stuff_id = ?", count, tg_id,
-                         staff_id, commit=True)
+            self.execute(
+                "UPDATE purchases SET count = count - ? WHERE tg_id = ? AND stuff_id = ?{}".format(select_size), count,
+                tg_id,
+                staff_id, commit=True)
         else:
-            self.execute(f"DELETE FROM purchases WHERE tg_id = ? AND stuff_id = ?", tg_id, staff_id, commit=True)
+            self.execute("DELETE FROM purchases WHERE tg_id = ? AND stuff_id = ?{}".format(select_size), tg_id,
+                         staff_id, commit=True)
+
+    def add_user_purchase(self, tg_id: int, staff_id: int, size_id: int | None = None, count: int | None = None):
+        select_size = ''
+        if size_id is not None:
+            select_size = f' AND size_id = {size_id}'
+        staff_count = self.execute(
+            "SELECT count FROM purchases WHERE tg_id = ? AND stuff_id = ?{}".format(select_size),
+            tg_id, staff_id, fetch='ONE')
+        if staff_count is None:
+            self.execute(f'INSERT INTO purchases (tg_id, stuff_id, stuff_sizes_id, count) VALUES (?, ?, ?, ?)', tg_id,
+                         staff_id, size_id, count, fetch=True)
+        else:
+            self.execute(
+                'UPDATE purchases SET count = count + ? WHERE tg_id = ? AND stuff_id = ?{}'.format(select_size),
+                count, tg_id, staff_id, fetch=True)
 
     # def get_user_info_by_code(self, code: str, what: str):
     #     return self.execute("SELECT " + what + " FROM users WHERE enter_code = ?", code, fetch="one")

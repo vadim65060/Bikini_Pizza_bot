@@ -38,7 +38,7 @@ class AntispamMiddleware(BaseMiddleware):
     Промежуточное ПО для антифлуда
     """
 
-    def __init__(self, period=10, period_max_messages=5, ban_time=60, key_prefix='antispam'):
+    def __init__(self, period=10, period_max_messages=10, ban_time=60, key_prefix='antispam'):
         """
         Установка параметров по умолчанию для антифлуда
 

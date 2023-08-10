@@ -37,7 +37,7 @@ async def order_start(callback: CallbackQuery, state: FSMContext):
     await print_order(callback.message, state, callback.from_user.id)
 
 
-async def select_pickup_address(callback: CallbackQuery, state: FSMContext):
+async def select_pickup_address(callback: CallbackQuery):
     await callback.message.edit_text(order_texts.SELECT_SHOP_ADDRESSES_TEXT,
                                      reply_markup=order_markups.get_pickup_addresses(db))
     await OrderState.select_pickup_address.set()
@@ -53,7 +53,7 @@ async def off_pickup(callback: CallbackQuery, state: FSMContext):
     await print_order(callback, state, callback.from_user.id)
 
 
-async def select_balls_to_use(callback: CallbackQuery, state: FSMContext):
+async def select_balls_to_use(callback: CallbackQuery):
     await callback.message.edit_text(order_texts.BALLS_TEXT, reply_markup=None)
     await OrderState.balls_select.set()
 
@@ -71,7 +71,7 @@ async def set_balls_to_use(message: Message, state: FSMContext):
     await print_order(message, state)
 
 
-async def get_comment(callback: CallbackQuery, state: FSMContext):
+async def get_comment(callback: CallbackQuery):
     await callback.answer(order_texts.GET_COMMENT_TEXT)
     await OrderState.get_comment.set()
 
@@ -122,7 +122,7 @@ async def shipping_callback(query: ShippingQuery, state: FSMContext) -> None:
         return
 
     options = list()
-    options.append(ShippingOption('1', 'Доставка курьером', [LabeledPrice('Доставка', delivery_price * 100)]))
+    options.append(ShippingOption('0', 'Доставка курьером', [LabeledPrice('Доставка', delivery_price * 100)]))
     await state.update_data({'delivery_cost': delivery_price})
     await query.bot.answer_shipping_query(query.id, ok=True, shipping_options=options)
 
@@ -176,9 +176,10 @@ async def successful_payment(message: Message, state: FSMContext):
     order_id, = db.checkout(message.from_user.id, message.successful_payment.total_amount // 100, balls, delivery_cost,
                             phone, address, comment)
     await order_escort_handlers.print_order(order_id)
-    await message.answer(order_texts.ORDER_COMPLETED_TEXT.format(message.successful_payment.total_amount // 100,
-                                                                 message.successful_payment.currency),
-                         reply_markup=menu_markup)
+    await message.answer(
+        order_texts.ORDER_COMPLETED_TEXT.format(order_id, message.successful_payment.total_amount // 100,
+                                                message.successful_payment.currency),
+        reply_markup=menu_markup)
     await state.finish()
 
 

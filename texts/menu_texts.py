@@ -35,6 +35,15 @@ def get_profile_text(db: DataBase, tg_id, print_sum=True):
     if not booked_list:
         return text, 0
     text += "\n<b>Корзина</b>\n"
+    basket_text, total_price = get_user_basket_text(booked_list, print_sum)
+    text += basket_text
+    return text, total_price
+
+
+def get_user_basket_text(booked_list, print_sum=True):
+    if not booked_list:
+        return '', 0
+    text = ''
     total_price = 0
     for stuff_id, stuff_sizes_id, name, price, size, count in booked_list:
         text += f"{name}"
@@ -44,7 +53,7 @@ def get_profile_text(db: DataBase, tg_id, print_sum=True):
         total_price += price * count
     if print_sum:
         text += f'---------------\n' \
-                f'Итого: {total_price}RUB'
+                f'Итого: {total_price}RUB\n'
     return text, total_price
 
 

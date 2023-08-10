@@ -26,7 +26,7 @@ DELIVERY_ZONE_BUTTON_TEXT = 'Зоны доставки'
 DELIVERY_ZONE_URL = 'https://yandex.ru/maps/?um=constructor' \
                     '%3A38e7ac5af51607ab4e996b58fe775240204ebf377075397488c961da2eae134d&source=constructorLink'
 
-ORDER_COMPLETED_TEXT = "Заказ на сумму {} {} принят, приятного аппетита!"
+ORDER_COMPLETED_TEXT = "Заказ №{} на сумму {} {} принят, приятного аппетита!"
 
 
 def get_order_text(db: DataBase, tg_id: int, balls: int, pickup_address: str, comment: str | None):

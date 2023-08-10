@@ -52,14 +52,17 @@ async def generate_qr_code(message: types.Message, state: FSMContext):
             await message.answer_photo(photo)
 
 
-async def show_profile(message: types.Message):
-    text, price = menu_texts.get_profile_text(data_base, message.from_user.id)
+async def show_profile(update: types.Message | types.CallbackQuery):
+    text, price = menu_texts.get_profile_text(data_base, update.from_user.id)
     markup = None
     if price:
         markup = menu_markups.start_order_markup
     else:
         text += '\nКорзина пуста'
-    await message.answer(text, reply_markup=markup, parse_mode=ParseMode.HTML)
+    if isinstance(update, types.CallbackQuery):
+        await update.message.edit_text(text, reply_markup=markup, parse_mode=ParseMode.HTML)
+    else:
+        await update.answer(text, reply_markup=markup, parse_mode=ParseMode.HTML)
 
 
 async def show_help(message: types.Message, state: FSMContext):
