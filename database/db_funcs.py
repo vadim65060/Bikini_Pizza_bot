@@ -309,18 +309,17 @@ class DataBase:
 
     def get_all_sizes_by_stuff_id(self, stuff_id):
         """
-        Возвращает [(sizes_id, size) for sizes_id, size in ...]
+        Возвращает [(sizes_id, size, price) for sizes_id, size in ...]
         :param stuff_id:
         :return:
         """
         res = []
         sizes = self.execute(
-            "SELECT id, size, count FROM stuff_sizes WHERE stuff_id = ? and size IS NOT NULL",
+            "SELECT id, size, price FROM stuff_sizes WHERE stuff_id = ? and size IS NOT NULL",
             stuff_id,
             fetch=True)
-        for sizes_id, size, count in sizes:
-            if count > 0:
-                res.append((sizes_id, size))
+        for sizes_id, size, price in sizes:
+            res.append((sizes_id, size, price))
         return res
 
     def get_stuff_sizes(self, sizes_id, what: str):
