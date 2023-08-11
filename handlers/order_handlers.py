@@ -102,7 +102,8 @@ async def buy(callback: CallbackQuery, state: FSMContext):
                                     payload=BUY_PAYLOAD,
                                     need_phone_number=True,
                                     need_shipping_address=pickup_address is None,
-                                    is_flexible=pickup_address is None)
+                                    is_flexible=pickup_address is None,
+                                    max_tip_amount=50000*100)
 
 
 async def shipping_callback(query: ShippingQuery, state: FSMContext) -> None:
