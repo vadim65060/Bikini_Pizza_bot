@@ -74,7 +74,7 @@ async def set_stuff_description(message: Message, state: FSMContext):
 
     await state.update_data({'stuff_description': message.text})
     await message.answer(asr_texts.STUFF_COUNT_UPDATE_TEXT)
-    await StuffCreateState.set_count.set()
+    await StuffCreateState.set_image.set()
 
 
 @admins.check(level=2)
@@ -110,10 +110,9 @@ async def print_created_stuff(message: Message, state: FSMContext):
     category_name = data_base.get_stuff_category_info(category_id, 'name')
     price = data['stuff_price']
     description = data['stuff_description']
-    count = data['stuff_count']
+    # count = data['stuff_count']
     image = data['stuff_image']
-    text = asr_texts.STUFF_FIELDS_PRINT.format(name, price, category_name, category_id, description,
-                                               count)
+    text = asr_texts.STUFF_FIELDS_PRINT.format(name, price, category_name, category_id, description)
     await message.answer_photo(image.file_id, text)
 
 
@@ -123,11 +122,11 @@ async def save_staff(message: Message, state: FSMContext):
     category_id = data['stuff_category_id']
     price = data['stuff_price']
     description = data['stuff_description']
-    count = data['stuff_count']
+    # count = data['stuff_count']
     image: PhotoSize = data['stuff_image']
     image_path = f'stuff/{name}_{image.file_id[-4:]}.png'
     await image.download(constants.STORE_PATH + image_path)
-    data_base.add_stuff(message.from_user.id, category_id, name, description, price, image_path, count)
+    data_base.add_stuff(message.from_user.id, category_id, name, description, price, image_path, 1)
     await message.answer(asr_texts.STUFF_SAVE_TEXT, reply_markup=stuff_redactor_markup)
 
 

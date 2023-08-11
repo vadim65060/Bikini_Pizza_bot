@@ -8,26 +8,24 @@ TO_STAFF_REDACTOR_MACKUP.add(admin_menu_texts.MENU_STUFF_REDACTOR_BUTTON_TEXT)
 
 STUFF_FIELDS_MARKUP = InlineKeyboardMarkup()
 STUFF_FIELDS_MARKUP.add(IKB(text=asr_texts.FIELD_NAME_TEXT,
-                            callback_data=asr_callbacks.FIELD_NAME_CALLBACK),
+                            callback_data=asr_callbacks.FIELD_NAME_CB),
                         IKB(text=asr_texts.FIELD_PRICE_TEXT,
-                            callback_data=asr_callbacks.FIELD_PRICE_CALLBACK),
-                        IKB(text=asr_texts.FIELD_COUNT_TEXT,
-                            callback_data=asr_callbacks.FIELD_COUNT_CALLBACK))
+                            callback_data=asr_callbacks.FIELD_PRICE_CB))
 STUFF_FIELDS_MARKUP.add(IKB(text=asr_texts.FIELD_CATEGORY_TEXT,
-                            callback_data=asr_callbacks.FIELD_CATEGORY_CALLBACK),
+                            callback_data=asr_callbacks.FIELD_CATEGORY_CB),
                         IKB(text=asr_texts.FIELD_DESCRIPTION_TEXT,
-                            callback_data=asr_callbacks.FIELD_DESCRIPTION_CALLBACK))
+                            callback_data=asr_callbacks.FIELD_DESCRIPTION_CB))
 STUFF_FIELDS_MARKUP.add(IKB(text=asr_texts.FIELD_IMAGE_TEXT,
-                            callback_data=asr_callbacks.FIELD_IMAGE_CALLBACK),
+                            callback_data=asr_callbacks.FIELD_IMAGE_CB),
                         IKB(text=asr_texts.FIELD_SHOW_TEXT,
-                            callback_data=asr_callbacks.FIELD_SHOW_CALLBACK))
+                            callback_data=asr_callbacks.FIELD_SHOW_CB))
 STUFF_FIELDS_MARKUP.add(IKB(text=asr_texts.BACK_BUTTON_TEXT,
-                            callback_data=asr_callbacks.BACK_FIELDS_CALLBACK))
+                            callback_data=asr_callbacks.BACK_FIELDS_CB))
 STUFF_SELECT_MARKUP = InlineKeyboardMarkup()
 STUFF_SELECT_MARKUP.add(IKB(text=asr_texts.BACK_BUTTON_TEXT,
-                            callback_data=asr_callbacks.BACK_STAFF_CALLBACK))
+                            callback_data=asr_callbacks.BACK_STAFF_CB))
 CATEGORY_SELECT_MARKUP = InlineKeyboardMarkup(IKB(text=BACK_TO_MENU_BUTTON_TEXT,
-                                                  callback_data=asr_callbacks.BACK_CATEGORIES_CALLBACK))
+                                                  callback_data=asr_callbacks.BACK_CATEGORIES_CB))
 
 DELETE_MARKUP = InlineKeyboardMarkup()
 DELETE_MARKUP.add(IKB(text=asr_texts.DELETE_TEXT, callback_data=asr_texts.DELETE_CALLBACK_TEXT),
@@ -35,10 +33,10 @@ DELETE_MARKUP.add(IKB(text=asr_texts.DELETE_TEXT, callback_data=asr_texts.DELETE
 
 CATEGORY_FIELDS_MARKUP = InlineKeyboardMarkup()
 CATEGORY_FIELDS_MARKUP.add(IKB(text=asr_texts.FIELD_NAME_TEXT,
-                               callback_data=asr_callbacks.FIELD_NAME_CALLBACK),
+                               callback_data=asr_callbacks.FIELD_NAME_CB),
                            IKB(text=asr_texts.FIELD_DESCRIPTION_TEXT,
-                               callback_data=asr_callbacks.FIELD_DESCRIPTION_CALLBACK),
+                               callback_data=asr_callbacks.FIELD_DESCRIPTION_CB),
                            IKB(text=asr_texts.FIELD_IMAGE_TEXT,
-                               callback_data=asr_callbacks.FIELD_IMAGE_CALLBACK))
+                               callback_data=asr_callbacks.FIELD_IMAGE_CB))
 CATEGORY_FIELDS_MARKUP.add(IKB(text=asr_texts.BACK_BUTTON_TEXT,
-                               callback_data=asr_callbacks.BACK_CATEGORY_CALLBACK))
+                               callback_data=asr_callbacks.BACK_CATEGORY_CB))

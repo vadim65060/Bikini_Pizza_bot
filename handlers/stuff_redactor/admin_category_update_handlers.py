@@ -83,15 +83,15 @@ async def print_selected_field(callback_query: CallbackQuery, state: FSMContext)
     text: str
     new_state: State
     match callback:
-        case asr_callbacks.FIELD_NAME_CALLBACK:
+        case asr_callbacks.FIELD_NAME_CB:
             text = asr_texts.STUFF_NAME_UPDATE_TEXT
             new_state = CategoryEditState.edit_name
 
-        case asr_callbacks.FIELD_DESCRIPTION_CALLBACK:
+        case asr_callbacks.FIELD_DESCRIPTION_CB:
             text = asr_texts.STUFF_DESCRIPTION_UPDATE_TEXT
             new_state = CategoryEditState.edit_description
 
-        case asr_callbacks.FIELD_IMAGE_CALLBACK:
+        case asr_callbacks.FIELD_IMAGE_CB:
             text = asr_texts.STUFF_IMAGE_UPDATE_TEXT
             new_state = CategoryEditState.edit_image
 
@@ -125,5 +125,5 @@ def register_admin_category_update_handlers():
                                       state=CategoryEditState.edit_image)
 
     admin_dp.register_callback_query_handler(back_button,
-                                             asr_callbacks.BACK_CALLBACK.filter(back_from='staff_categories'),
+                                             asr_callbacks.BACK_CB.filter(back_from='staff_categories'),
                                              state=CategoryEditState.select_field)

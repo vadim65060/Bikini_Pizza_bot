@@ -153,31 +153,31 @@ async def print_selected_field(callback_query: CallbackQuery, state: FSMContext)
     text: str
     new_state: State
     match callback:
-        case asr_callbacks.FIELD_NAME_CALLBACK:
+        case asr_callbacks.FIELD_NAME_CB:
             text = asr_texts.STUFF_NAME_UPDATE_TEXT
             new_state = StuffEditState.edit_field_name
 
-        case asr_callbacks.FIELD_PRICE_CALLBACK:
+        case asr_callbacks.FIELD_PRICE_CB:
             text = asr_texts.STUFF_PRICE_UPDATE_TEXT
             new_state = StuffEditState.edit_field_price
 
-        case asr_callbacks.FIELD_COUNT_CALLBACK:
+        case asr_callbacks.FIELD_COUNT_CB:
             text = asr_texts.STUFF_COUNT_UPDATE_TEXT
             new_state = StuffEditState.edit_field_count
 
-        case asr_callbacks.FIELD_CATEGORY_CALLBACK:
+        case asr_callbacks.FIELD_CATEGORY_CB:
             text = asr_texts.STUFF_CATEGORY_UPDATE_TEXT
             new_state = StuffEditState.edit_field_category
 
-        case asr_callbacks.FIELD_DESCRIPTION_CALLBACK:
+        case asr_callbacks.FIELD_DESCRIPTION_CB:
             text = asr_texts.STUFF_DESCRIPTION_UPDATE_TEXT
             new_state = StuffEditState.edit_field_description
 
-        case asr_callbacks.FIELD_IMAGE_CALLBACK:
+        case asr_callbacks.FIELD_IMAGE_CB:
             text = asr_texts.STUFF_IMAGE_UPDATE_TEXT
             new_state = StuffEditState.edit_field_image
 
-        case asr_callbacks.FIELD_SHOW_CALLBACK:
+        case asr_callbacks.FIELD_SHOW_CB:
             await edit_stuff_show(callback_query.message, state)
             return
         case _:
@@ -194,11 +194,11 @@ async def activate_back_button(callback_query: CallbackQuery, state: FSMContext)
     new_state: State
     await callback_query.message.delete()
     match callback:
-        case asr_callbacks.BACK_FIELDS_CALLBACK:
+        case asr_callbacks.BACK_FIELDS_CB:
             new_state = StuffEditState.select_stuff
-        case asr_callbacks.BACK_STAFF_CALLBACK:
+        case asr_callbacks.BACK_STAFF_CB:
             new_state = StuffEditState.select_stuff_category
-        case asr_callbacks.BACK_CATEGORIES_CALLBACK:
+        case asr_callbacks.BACK_CATEGORIES_CB:
             return
         case _:
             return
@@ -231,6 +231,5 @@ def register_admin_staff_update_handlers():
                                       state=StuffEditState.edit_field_image)
 
     admin_dp.register_callback_query_handler(activate_back_button,
-                                             asr_callbacks.BACK_CALLBACK.filter(),
-                                             state=[StuffEditState.select_field, StuffEditState.select_stuff,
-                                              StuffEditState.select_stuff_category])
+                                             asr_callbacks.BACK_CB.filter(),
+                                             state=StuffEditState.all_states)

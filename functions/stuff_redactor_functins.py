@@ -22,11 +22,10 @@ async def print_edited_stuff(message: Message, state: FSMContext, markup=asr_mar
     stuff_id = data['stuff_id']
     if edit:
         message = data['edit_stuff']
-    data = data_base.get_stuff_info(stuff_id, 'name, stuff_category_id, price, description, count, img_path, show')
-    name, category_id, price, description, count, image, show = data
+    data = data_base.get_stuff_info(stuff_id, 'name, stuff_category_id, price, description, img_path, show')
+    name, category_id, price, description, image, show = data
     category_name, = data_base.get_stuff_category_info(category_id, 'name')
-    text = asr_texts.STUFF_FIELDS_PRINT.format(name, price, category_name, category_id, description,
-                                               count)
+    text = asr_texts.STUFF_FIELDS_PRINT.format(name, price, category_name, category_id, description)
     text += asr_texts.STUFF_SHOW_FIELD_PRINT.format(bool(show))
     new_message = await store_cached_imgs.send_cached_img(message, image, text,
                                                           reply_markup=markup,

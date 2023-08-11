@@ -88,10 +88,10 @@ def register_admin_staff_delete_handlers():
                                       state=StuffDeleteState.select_stuff)
 
     admin_dp.register_callback_query_handler(confirm_delete,
-                                             asr_callbacks.DELETE_CALLBACK.filter(),
+                                             asr_callbacks.DELETE_CB.filter(),
                                              state=StuffDeleteState.delete_stuff)
     admin_dp.register_callback_query_handler(cancel_delete,
-                                             asr_callbacks.NOT_DELETE_CALLBACK.filter(),
+                                             asr_callbacks.NOT_DELETE_CB.filter(),
                                              state=StuffDeleteState.delete_stuff)
     admin_dp.register_callback_query_handler(delete_stuff,
                                              YES_NO_CALLBACK.filter(decision='1'),
