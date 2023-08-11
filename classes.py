@@ -36,9 +36,13 @@ class Config:
         with open(self.config_path, 'w', encoding='utf-8') as file:
             file.write(CONFIG_TEMPLATE)
 
-    def update_orders_chat(self, chat_id):
+    def update_orders_chat(self, chat_id: int):
         self.orders_chat_id = chat_id
         self.__save_setting('orders_chat_id', chat_id)
+
+    def update_support_chat(self, chat_id: int):
+        self.support_chat_id = chat_id
+        self.__save_setting('support_chat_id', chat_id)
 
     def __load_settings(self):
         with open(self.config_path, 'r', encoding='utf-8') as file:

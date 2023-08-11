@@ -59,14 +59,15 @@ def get_user_basket_text(booked_list, print_sum=True):
 
 MESSAGE_CANT_BE_EDITED_TEXT = "Сообщение не редактируется :("
 
+FAQ_TEXT = 'FAQ_TEXT'
 HELP_INPUT_REQUEST = "Введи свой вопрос"
 HELP_MESSAGE_SENT = "Запрос отправлен, возвращаю тебя в меню"
 BACK_TO_MENU_TEXT = "Хорошо, возвращаю тебя в меню"
-TO_SUPPORT_MESSAGE_TEMPLATE = "Пользователь @{}\n" \
-                              "Ссылка на него\n{}\n" \
-                              "Он написал:\n{}"
+TO_SUPPORT_MESSAGE_TEMPLATE = "Пользователь: @{}\n" \
+                              "Ссылка: {}\n" \
+                              "Вопрос:\n{}"
 
-PROMO_INPUT_REQUEST = "Если у тебя есть промокод от организаторов, введи его сюда"
+PROMO_INPUT_REQUEST = "Если у тебя есть промокод, введи его сюда"
 PROMO_SUCCESSFULLY_ACTIVATED_TEMPLATE = "Промокод на {} активирован! Возвращаю тебя в меню 😎"
 PROMO_ALREADY_USED = "Ты уже вводил этот промокод, возвращаю тебя в меню"
 PROMO_DOESNT_EXISTS = "Промокод недействителен 😕 Попробуй ещё раз!"

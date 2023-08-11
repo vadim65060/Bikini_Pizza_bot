@@ -116,7 +116,7 @@ def get_thing_no_color_size_text_markup(db: DataBase, stuff_id, tg_id):
     else:
         description += "\n\n"
     text = f"<b>{name}</b>\n\n{description}" \
-           f"Цена: {price}"
+           f"Цена: {price}RUB"
     booked = db.how_many_stuff_booked(tg_id, stuff_id)
     if booked:
         text += f"\nВ корзине: {booked} шт."

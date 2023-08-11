@@ -65,14 +65,14 @@ async def show_profile(update: types.Message | types.CallbackQuery):
         await update.answer(text, reply_markup=markup, parse_mode=ParseMode.HTML)
 
 
-async def show_help(message: types.Message, state: FSMContext):
-    await message.answer(data_base.get_help_text(),
+async def show_help(message: types.Message):
+    await message.answer(menu_texts.FAQ_TEXT,
                          reply_markup=menu_markups.help_markup,
                          parse_mode=ParseMode.HTML,
                          disable_web_page_preview=True)
 
 
-async def support_input(message: types.Message, state: FSMContext):
+async def support_input(message: types.Message):
     await message.answer(menu_texts.HELP_INPUT_REQUEST,
                          reply_markup=ReplyKeyboardMarkup(
                              resize_keyboard=True
@@ -106,7 +106,7 @@ async def support_sent(message: types.Message, state: FSMContext):
     await state.finish()
 
 
-async def promo_respond(message: types.Message, state: FSMContext):
+async def promo_respond(message: types.Message):
     await message.answer(menu_texts.PROMO_INPUT_REQUEST,
                          reply_markup=ReplyKeyboardMarkup(resize_keyboard=True).add(menu_markups.CANCEL_BUTTON))
     await menu_fsm.PromoState.input_wait.set()
@@ -131,21 +131,29 @@ async def promo_input(message: types.Message, state: FSMContext):
                              )
 
 
-async def show_shop_temp_message(message: types.Message, state: FSMContext):
+async def show_shop_temp_message(message: types.Message):
     await message.answer(menu_texts.STORE_TEMP_TEXT)
 
 
+async def clear_markup(message: Message):
+    await message.answer('клавиатура очищена', reply_markup=types.ReplyKeyboardRemove())
+
+
 @admins.check(level=3)
-async def set_orders_chat(message: Message, state: FSMContext):
+async def set_orders_chat(message: Message):
     config.update_orders_chat(message.chat.id)
     await message.answer('чат для заказов установлен')
 
 
+@admins.check(level=3)
+async def set_support_chat(message: Message):
+    config.update_support_chat(message.chat.id)
+    await message.answer('чат поддержки установлен')
+
+
 # Рассылка
 @admins.check(level=3)
-async def lettering_respond(message: Message, state: FSMContext):
-    # if message.from_user.id != constants.LETTERING_ADMIN_ID:
-    #     return
+async def lettering_respond(message: Message):
     markup = ReplyKeyboardMarkup()
     markup.add(menu_markups.CANCEL_BUTTON)
     await message.answer("Пожалуйста, введите текст рассылки.",
@@ -155,9 +163,6 @@ async def lettering_respond(message: Message, state: FSMContext):
 
 @admins.check(level=3)
 async def lettering_get(message: types.Message, state: FSMContext):
-    # if message.from_user.id != constants.LETTERING_ADMIN_ID:
-    #     return
-
     text = message.text
     markup = ReplyKeyboardMarkup()
     markup.add("Подтвердить")
@@ -173,8 +178,6 @@ async def lettering_get(message: types.Message, state: FSMContext):
 
 @admins.check(level=3)
 async def lettering_start_lettering(message, state: FSMContext):
-    # if message.from_user.id != constants.LETTERING_ADMIN_ID:
-    #     return
     data = await state.get_data()
     text = data["lettering_text"]
 
@@ -199,6 +202,8 @@ async def lettering_start_lettering(message, state: FSMContext):
 
 def register_menu_handlers():
     dp.register_message_handler(set_orders_chat, commands=['orderschat'])
+    dp.register_message_handler(set_support_chat, commands=['supportchat'])
+    dp.register_message_handler(clear_markup, commands=['clear'])
     # Рассылка
     dp.register_message_handler(lettering_respond,
                                 text="Рассылка",
