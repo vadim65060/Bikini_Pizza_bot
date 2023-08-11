@@ -63,7 +63,6 @@ async def back_state(callback: CallbackQuery, callback_data: dict):
 
 
 async def print_yes_no(callback: CallbackQuery, callback_data: dict):
-    print(callback.data)
     await callback.message.edit_reply_markup(
         OEM.yes_no_markup(callback.message.reply_markup, callback_data, int(callback_data['state'])))
 

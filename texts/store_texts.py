@@ -17,14 +17,11 @@ NO_RETURN_DISCLAIMER = "Учти, что забронированный мерч
 
 
 def get_size_color_thing_has_bought_text(db: DataBase, colors_sizes_id):
-    stuff_id, size, color = db.get_stuff_sizes_texts_info(colors_sizes_id,
-                                                          "stuff_id, size, color")
+    stuff_id, size = db.get_stuff_sizes_texts_info(colors_sizes_id, "stuff_id, size")
     name, = db.get_stuff_info(stuff_id, "name")
-    if not color:
-        return f"{name} {size} - хороший выбор. Поздравляю тебя с покупкой."
-    elif not size:
-        return f"{name} {color} - хороший выбор. Поздравляю тебя с покупкой."
-    return f"{name} {size} {color} - хороший выбор. Поздравляю тебя с покупкой."
+    if not size:
+        return f"{name} - хороший выбор. Поздравляю тебя с покупкой."
+    return f"{name} {size} - хороший выбор. Поздравляю тебя с покупкой."
 
 
 def get_no_size_color_thing_has_bought_text(db: DataBase, stuff_id):
@@ -51,16 +48,14 @@ def get_thing_no_color_size_confirmation_text_markup(db: DataBase, stuff_id):
 
 
 def get_thing_color_size_confirmation_text_markup(db: DataBase, colors_sizes_id):
-    data = db.get_stuff_sizes(colors_sizes_id, "stuff_id, size, color")
-    stuff_id, size, color = data
-    data = db.get_stuff_info(stuff_id, "name, price")
-    name, price = data
+    data = db.get_stuff_sizes(colors_sizes_id, "stuff_id, price, size")
+    stuff_id, price, size = data
+    data = db.get_stuff_info(stuff_id, "name")
+    name, = data
     text = f"Ты уверен, что хочешь приобрести предмет {name} "
     if size:
         text += f"размера {size} "
-    if color:
-        text += f"цвета {color}"
-    text += f"за {price}i?\n\n" + NO_RETURN_DISCLAIMER
+    text += f"за {price}RUB?\n\n"
     markup = InlineKeyboardMarkup().add(
         InlineKeyboardButton("Подтвердить",
                              callback_data=BUY_CONFIRM_COLORS_SIZES_CB.new(

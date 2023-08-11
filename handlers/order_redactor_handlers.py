@@ -38,4 +38,4 @@ async def exit_edit_mode(callback: CallbackQuery):
 def register_order_redactor_handlers():
     dp.register_callback_query_handler(exit_edit_mode, CallbackData(order_redactor_callbacks.BACK_CB).filter())
     dp.register_callback_query_handler(print_order_edit, CallbackData(BASKET_EDIT_CB).filter())
-    dp.register_callback_query_handler(edit_order, order_redactor_callbacks.STAFF_EDIT_CB.filter())
+    dp.register_callback_query_handler(edit_order, order_redactor_callbacks.BASKET_EDIT_CB.filter())

@@ -224,10 +224,11 @@ class DataBase:
         """
         res = []
         for stuff_id, stuff_sizes_id, count in staff_list:
-            name, price = self.get_stuff_info(stuff_id, "name, price")
+            name, = self.get_stuff_info(stuff_id, "name")
             if stuff_sizes_id is not None:
                 price, size = self.get_stuff_sizes_texts_info(stuff_sizes_id, "price, size")
             else:
+                price, = self.get_stuff_info(stuff_id, "price")
                 size = None
             res.append((stuff_id, stuff_sizes_id, name, price, size, count))
         return res
@@ -361,13 +362,13 @@ class DataBase:
     def delete_user_purchase(self, tg_id: int, staff_id: int, size_id: int | None = None, count: int | None = None):
         select_size = ''
         if size_id is not None:
-            select_size = f' AND size_id = {size_id}'
+            select_size = f' AND stuff_sizes_id = {size_id}'
         if count is None:
             self.execute("DELETE FROM purchases WHERE tg_id = ? AND stuff_id = ?{}".format(select_size), tg_id,
                          staff_id, commit=True)
             return
 
-        staff_count = self.execute("SELECT count FROM purchases WHERE tg_id = ? AND stuff_id = ?".format(select_size),
+        staff_count = self.execute("SELECT count FROM purchases WHERE tg_id = ? AND stuff_id = ?{}".format(select_size),
                                    tg_id, staff_id,
                                    fetch='ONE')
         if staff_count is None:
@@ -386,7 +387,7 @@ class DataBase:
     def add_user_purchase(self, tg_id: int, staff_id: int, size_id: int | None = None, count: int | None = None):
         select_size = ''
         if size_id is not None:
-            select_size = f' AND size_id = {size_id}'
+            select_size = f' AND stuff_sizes_id = {size_id}'
         staff_count = self.execute(
             "SELECT count FROM purchases WHERE tg_id = ? AND stuff_id = ?{}".format(select_size),
             tg_id, staff_id, fetch='ONE')
@@ -585,7 +586,7 @@ class DataBase:
     # 1 - недостаточно денег, 2 - мерча уже нет, 3 - ошибка при транзакции
     def buy_size_stuff(self, tg_id, sizes_id):
         stuff_id, count = self.get_stuff_sizes_texts_info(sizes_id, "stuff_id, count")
-        price = self.get_stuff_info(stuff_id, "price")
+        price, = self.get_stuff_info(stuff_id, "price")
         user_money = self.get_user_money(tg_id)
         if user_money < price:
             self.add_transaction(constants.TransactionTypes.PURCHASE_FAIL.value, tg_id, None,
