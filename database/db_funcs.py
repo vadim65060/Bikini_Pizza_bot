@@ -584,46 +584,45 @@ class DataBase:
 
     # 1 - недостаточно денег, 2 - мерча уже нет, 3 - ошибка при транзакции
     def buy_size_stuff(self, tg_id, sizes_id):
-        stuff_id, count = self.get_stuff_sizes_texts_info(sizes_id, "stuff_id, count")
-        price, = self.get_stuff_info(stuff_id, "price")
-        user_money = self.get_user_money(tg_id)
-        if user_money < price:
+        stuff_id, = self.get_stuff_sizes_texts_info(sizes_id, "stuff_id")
+        # price, = self.get_stuff_info(stuff_id, "price")
+        # user_money = self.get_user_money(tg_id)
+        # if user_money < price:
+        #     self.add_transaction(constants.TransactionTypes.PURCHASE_FAIL.value, tg_id, None,
+        #                          f"not enough money, sizes_id = {sizes_id}")
+        #     return 1
+        # elif count <= 0:
+        #     self.add_transaction(constants.TransactionTypes.PURCHASE_FAIL.value, tg_id, None,
+        #                          f"not enough items, sizes_id = {sizes_id}")
+        #     return 2
+        cur = self.con.cursor()
+        fail = False
+        try:
+            # cur.execute("UPDATE users SET money = money - ? WHERE tg_id = ?;", (price, tg_id))
+            # cur.execute("UPDATE stuff_sizes SET count = count - 1 WHERE id = ?;", (sizes_id,))
+            cur.execute("INSERT INTO purchases (tg_id, stuff_id, stuff_sizes_id, count) "
+                        "VALUES (?, ?, ?, 1) "
+                        "ON CONFLICT (tg_id, stuff_id, stuff_sizes_id) DO UPDATE SET count = count + 1 "
+                        "WHERE tg_id = ? and stuff_id = ? and stuff_sizes_id = ?",
+                        (tg_id, stuff_id, sizes_id, tg_id, stuff_id, sizes_id))
+            # update purchases
+            self.con.commit()
+        except (sqlite3.DatabaseError, sqlite3.InternalError) as e:
+            print(e)
+            self.con.rollback()
+            fail = True
+        cur.close()
+        if fail:
             self.add_transaction(constants.TransactionTypes.PURCHASE_FAIL.value, tg_id, None,
-                                 f"not enough money, sizes_id = {sizes_id}")
-            return 1
-        elif count <= 0:
-            self.add_transaction(constants.TransactionTypes.PURCHASE_FAIL.value, tg_id, None,
-                                 f"not enough items, sizes_id = {sizes_id}")
-            return 2
-        else:
-            cur = self.con.cursor()
-            fail = False
-            try:
-                cur.execute("UPDATE users SET money = money - ? WHERE tg_id = ?;", (price, tg_id))
-                cur.execute("UPDATE stuff_sizes SET count = count - 1 WHERE id = ?;", (sizes_id,))
-                cur.execute("INSERT INTO purchases (tg_id, stuff_id, stuff_sizes_id, count) "
-                            "VALUES (?, ?, ?, 1) "
-                            "ON CONFLICT (tg_id, stuff_id, stuff_sizes_id) DO UPDATE SET count = count + 1 "
-                            "WHERE tg_id = ? and stuff_id = ? and stuff_sizes_id = ?",
-                            (tg_id, stuff_id, sizes_id, tg_id, stuff_id, sizes_id))
-                # update purchases
-                self.con.commit()
-            except (sqlite3.DatabaseError, sqlite3.InternalError) as e:
-                print(e)
-                self.con.rollback()
-                fail = True
-            cur.close()
-            if fail:
-                self.add_transaction(constants.TransactionTypes.PURCHASE_FAIL.value, tg_id, None,
-                                     f"transaction fail, sizes_id = {sizes_id}")
-                return 3
-            self.add_transaction(constants.TransactionTypes.PURCHASE_SUCCESS.value, tg_id, None,
-                                 f"sizes_id = {sizes_id}")
-            return 0
+                                 f"transaction fail, sizes_id = {sizes_id}")
+            return 3
+        self.add_transaction(constants.TransactionTypes.PURCHASE_SUCCESS.value, tg_id, None,
+                             f"sizes_id = {sizes_id}")
+        return 0
 
     # 1 - недостаточно денег, 2 - мерча уже нет, 3 - ошибка при транзакции
     def buy_no_size_stuff(self, tg_id, stuff_id):
-        price, count = self.get_stuff_info(stuff_id, "price, count")
+        # price, count = self.get_stuff_info(stuff_id, "price, count")
         # user_money = self.get_user_money(tg_id)
         if self.execute("SELECT id FROM purchases WHERE tg_id = ? and stuff_id = ?",
                         tg_id, stuff_id, fetch="one"):
@@ -634,37 +633,37 @@ class DataBase:
         #     self.add_transaction(constants.TransactionTypes.PURCHASE_FAIL.value, tg_id, None,
         #                          f"not enough money, stuff_id = {stuff_id}")
         #     return 1
-        if count <= 0:
+        # if count <= 0:
+        #     self.add_transaction(constants.TransactionTypes.PURCHASE_FAIL.value, tg_id, None,
+        #                          f"not enough items, stuff_id = {stuff_id}")
+        #     return 2
+
+        cur = self.con.cursor()
+        fail = False
+        try:
+            # cur.execute("UPDATE users SET money = money - ? WHERE tg_id = ?;", (price, tg_id))
+            # cur.execute("UPDATE stuff SET count = count - 1 WHERE id = ?;", (stuff_id,))
+            if not have_purchase:
+                cur.execute("INSERT INTO purchases (tg_id, stuff_id, stuff_sizes_id, count) "
+                            "VALUES (?, ?, NULL, 1) ",
+                            (tg_id, stuff_id))
+            else:
+                cur.execute("UPDATE purchases SET count = count + 1 "
+                            "WHERE tg_id = ? and stuff_id = ? and stuff_sizes_id is NULL",
+                            (tg_id, stuff_id))
+            self.con.commit()
+        except (sqlite3.DatabaseError, sqlite3.InternalError) as e:
+            print(e)
+            fail = True
+            self.con.rollback()
+        cur.close()
+        if fail:
             self.add_transaction(constants.TransactionTypes.PURCHASE_FAIL.value, tg_id, None,
-                                 f"not enough items, stuff_id = {stuff_id}")
-            return 2
-        else:
-            cur = self.con.cursor()
-            fail = False
-            try:
-                # cur.execute("UPDATE users SET money = money - ? WHERE tg_id = ?;", (price, tg_id))
-                cur.execute("UPDATE stuff SET count = count - 1 WHERE id = ?;", (stuff_id,))
-                if not have_purchase:
-                    cur.execute("INSERT INTO purchases (tg_id, stuff_id, stuff_sizes_id, count) "
-                                "VALUES (?, ?, NULL, 1) ",
-                                (tg_id, stuff_id))
-                else:
-                    cur.execute("UPDATE purchases SET count = count + 1 "
-                                "WHERE tg_id = ? and stuff_id = ? and stuff_sizes_id is NULL",
-                                (tg_id, stuff_id))
-                self.con.commit()
-            except (sqlite3.DatabaseError, sqlite3.InternalError) as e:
-                print(e)
-                fail = True
-                self.con.rollback()
-            cur.close()
-            if fail:
-                self.add_transaction(constants.TransactionTypes.PURCHASE_FAIL.value, tg_id, None,
-                                     f"transaction fail, stuff_id = {stuff_id}")
-                return 3
-            self.add_transaction(constants.TransactionTypes.PURCHASE_SUCCESS.value, tg_id, None,
-                                 f"stuff_id = {stuff_id}")
-            return 0
+                                 f"transaction fail, stuff_id = {stuff_id}")
+            return 3
+        self.add_transaction(constants.TransactionTypes.PURCHASE_SUCCESS.value, tg_id, None,
+                             f"stuff_id = {stuff_id}")
+        return 0
 
     def get_order_sum(self, tg_id: int):
         booked_list = self.booked_list(tg_id)
