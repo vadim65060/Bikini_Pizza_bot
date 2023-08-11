@@ -392,11 +392,11 @@ class DataBase:
             tg_id, staff_id, fetch='ONE')
         if staff_count is None:
             self.execute(f'INSERT INTO purchases (tg_id, stuff_id, stuff_sizes_id, count) VALUES (?, ?, ?, ?)', tg_id,
-                         staff_id, size_id, count, fetch=True)
+                         staff_id, size_id, count, commit=True)
         else:
             self.execute(
                 'UPDATE purchases SET count = count + ? WHERE tg_id = ? AND stuff_id = ?{}'.format(select_size),
-                count, tg_id, staff_id, fetch=True)
+                count, tg_id, staff_id, commit=True)
 
     # def get_user_info_by_code(self, code: str, what: str):
     #     return self.execute("SELECT " + what + " FROM users WHERE enter_code = ?", code, fetch="one")
