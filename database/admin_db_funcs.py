@@ -1,10 +1,9 @@
-import sqlite3
+import datetime as dt
 
 from validator_collection import checkers
 
 import constants
 from database.db_funcs import DataBase
-import datetime as dt
 
 
 class AdminDataBase(DataBase):
@@ -168,7 +167,7 @@ class AdminDataBase(DataBase):
         self.add_transaction(transaction_type.value, user_id, None,
                              f"user:{user_id}  update {table} {what} to {value}")
 
-    def update_stuff(self, user_id: int, what: str, stuff_id: int, value: int | str):
+    def update_stuff(self, user_id: int, what: str, stuff_id: int, value: int | str | None):
         self.__update_table_value(user_id, 'stuff', what, 'id', stuff_id, value,
                                   constants.TransactionTypes.UPDATE_STUFF)
 
