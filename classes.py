@@ -93,14 +93,16 @@ class CachedImages:
                     message = await message.edit_media(
                         InputMediaPhoto(InputFile(res), caption=caption, parse_mode=parse_mode),
                         reply_markup=reply_markup)
-                except:
+                except Exception as e:
                     print('Message is not modified')
+                    print(e)
             else:
                 try:
                     message = await message.edit_media(InputMediaPhoto(res, caption=caption, parse_mode=parse_mode),
                                                        reply_markup=reply_markup)
-                except:
+                except Exception as e:
                     print('Message is not modified')
+                    print(e)
         else:
             if not img_id:
                 message = await message.answer_photo(InputFile(res), caption=caption, reply_markup=reply_markup,

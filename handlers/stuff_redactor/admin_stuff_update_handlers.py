@@ -203,7 +203,8 @@ async def activate_back_button(callback_query: CallbackQuery, state: FSMContext)
         case asr_callbacks.BACK_CATEGORIES_CB:
             return
         case asr_callbacks.BACK_SELECT_SIZES:
-            await print_edited_stuff(callback_query.message, state, edit=True)
+            await print_edited_stuff(callback_query.message, state)
+            await callback_query.message.delete()
             return
         case asr_callbacks.BACK_SIZE_EDITOR:
             await handlers.stuff_redactor.admin_staff_sizes_edit_handlers.print_staff_sizes(callback_query, state)

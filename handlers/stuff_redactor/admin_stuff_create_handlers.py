@@ -73,7 +73,7 @@ async def set_stuff_description(message: Message, state: FSMContext):
         return
 
     await state.update_data({'stuff_description': message.text})
-    await message.answer(asr_texts.STUFF_COUNT_UPDATE_TEXT)
+    await message.answer(asr_texts.STUFF_IMAGE_UPDATE_TEXT)
     await StuffCreateState.set_image.set()
 
 
@@ -107,7 +107,7 @@ async def print_created_stuff(message: Message, state: FSMContext):
     data = await state.get_data()
     name = data['stuff_name']
     category_id = data['stuff_category_id']
-    category_name = data_base.get_stuff_category_info(category_id, 'name')
+    category_name, = data_base.get_stuff_category_info(category_id, 'name')
     price = data['stuff_price']
     description = data['stuff_description']
     # count = data['stuff_count']
