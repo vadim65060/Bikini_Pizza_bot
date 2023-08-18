@@ -217,7 +217,7 @@ class DataBase:
             res += count
         return res
 
-    def get_staff_list_info(self, staff_list: list):
+    def get_stuff_list_info(self, staff_list: list):
         """
         :param staff_list: [(stuff_id, stuff_sizes_id, count)]
         :return: [(stuff_id, stuff_sizes_id, name, price, size, count)]
@@ -241,14 +241,14 @@ class DataBase:
         data = self.execute("SELECT stuff_id, stuff_sizes_id, count "
                             "FROM purchases WHERE tg_id = ?",
                             tg_id, fetch="ALL")
-        return self.get_staff_list_info(data)
+        return self.get_stuff_list_info(data)
 
     def get_order_list(self, order_id):
         """
         :param order_id:
         :return: [(stuff_id, stuff_sizes_id, name, price, size, count)]
         """
-        return self.get_staff_list_info(self.parse_order_purchases(order_id))
+        return self.get_stuff_list_info(self.parse_order_purchases(order_id))
 
     def get_stuff_count_num_by_stuff_id(self, stuff_id):
         """
@@ -291,21 +291,9 @@ class DataBase:
                 res.append((size_id, price, size, count))
         return res
 
-    # def get_all_colors_by_stuff_id(self, stuff_id):
-    #     """
-    #     Возвращает [(colors_sizes_id, color) for colors_sizes_id, color in ...]
-    #     :param stuff_id:
-    #     :return:
-    #     """
-    #     res = []
-    #     colors = self.execute(
-    #         "SELECT id, color, count FROM stuff_sizes_colors WHERE stuff_id = ? and color IS NOT NULL",
-    #         stuff_id,
-    #         fetch=True)
-    #     for colors_sizes_id, color, count in colors:
-    #         if count > 0:
-    #             res.append((colors_sizes_id, color))
-    #     return res
+    def get_sizes_info_by_staff_id(self, stuff_id: int, what: str):
+        return self.execute(f"SELECT {what} FROM stuff_sizes WHERE stuff_id = ? and size IS NOT NULL", stuff_id,
+                            fetch=True)
 
     def get_all_sizes_by_stuff_id(self, stuff_id):
         """
@@ -322,7 +310,7 @@ class DataBase:
             res.append((sizes_id, size, price))
         return res
 
-    def get_stuff_sizes(self, sizes_id, what: str):
+    def get_from_stuff_size(self, sizes_id, what: str):
         data = self.execute("SELECT " + what + " FROM stuff_sizes WHERE id = ?", sizes_id,
                             fetch="one")
         return data

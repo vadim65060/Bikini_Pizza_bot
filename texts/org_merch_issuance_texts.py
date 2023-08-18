@@ -78,7 +78,7 @@ def profile_text_markup_get(db: AdminDataBase, tg_id, cancellation=False):
     for i, params in enumerate(data):
         purchase_id, stuff_id, stuff_sizes_colors_id, issued, count = params
         name, = db.get_stuff_info(stuff_id, "name")
-        size_color = db.get_stuff_sizes(stuff_sizes_colors_id, "size, color")
+        size_color = db.get_from_stuff_size(stuff_sizes_colors_id, "size, color")
         list_text += f"{i + 1}. "
         merch_fullname = name
         if size_color:

@@ -4,6 +4,7 @@ from aiogram.types import Message, CallbackQuery, ContentTypes
 from validator_collection import checkers
 
 import constants
+import handlers.stuff_redactor.admin_staff_sizes_edit_handlers
 from callbacks import admin_stuff_redactor_callbacks as asr_callbacks
 from fsm.admin_staff_redactor_fsm import StuffEditState
 from functions.stuff_redactor_functins import exit_check, print_edited_stuff, print_stuff_categories, \
@@ -180,9 +181,11 @@ async def print_selected_field(callback_query: CallbackQuery, state: FSMContext)
         case asr_callbacks.FIELD_SHOW_CB:
             await edit_stuff_show(callback_query.message, state)
             return
+        case asr_callbacks.SIZES_EDIT_CB:
+            await handlers.stuff_redactor.admin_staff_sizes_edit_handlers.start_sizes_edit(callback_query, state)
+            return
         case _:
-            text = 'field_error\nвведи id товара'
-            new_state = StuffEditState.select_stuff
+            return
     await callback_query.answer(text)
     await new_state.set()
 
@@ -192,7 +195,6 @@ async def print_selected_field(callback_query: CallbackQuery, state: FSMContext)
 async def activate_back_button(callback_query: CallbackQuery, state: FSMContext):
     callback = callback_query.data
     new_state: State
-    await callback_query.message.delete()
     match callback:
         case asr_callbacks.BACK_FIELDS_CB:
             new_state = StuffEditState.select_stuff
@@ -200,8 +202,15 @@ async def activate_back_button(callback_query: CallbackQuery, state: FSMContext)
             new_state = StuffEditState.select_stuff_category
         case asr_callbacks.BACK_CATEGORIES_CB:
             return
+        case asr_callbacks.BACK_SELECT_SIZES:
+            await print_edited_stuff(callback_query.message, state, edit=True)
+            return
+        case asr_callbacks.BACK_SIZE_EDITOR:
+            await handlers.stuff_redactor.admin_staff_sizes_edit_handlers.print_staff_sizes(callback_query, state)
+            return
         case _:
             return
+    await callback_query.message.delete()
     await new_state.set()
 
 

@@ -22,6 +22,8 @@ class StuffEditState(StatesGroup):
     edit_field_count = State()
     edit_field_image = State()
     edit_field_show = State()
+    edit_size = State()
+    edit_size_price = State()
 
 
 class StuffDeleteState(StatesGroup):

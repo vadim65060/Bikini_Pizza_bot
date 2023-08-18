@@ -12,6 +12,7 @@ from handlers import admin_promo_handlers, admin_give_admin_handlers
 from handlers.stuff_redactor import admin_category_update_handlers, admin_category_delete_handlers
 from handlers.stuff_redactor import admin_stuff_create_handlers, admin_stuff_update_handlers
 from handlers.stuff_redactor import admin_stuff_delete_handlers, admin_category_create_handlers
+from handlers.stuff_redactor import admin_staff_sizes_edit_handlers
 from markups import admin_menu_markups
 from middleware import admins
 from texts import admin_menu_texts, org_promo_texts
@@ -116,6 +117,7 @@ def register_admin_menu_handlers():
     admin_promo_handlers.register_org_promo_handlers()
     admin_stuff_create_handlers.register_admin_staff_create_handlers()
     admin_stuff_update_handlers.register_admin_staff_update_handlers()
+    admin_staff_sizes_edit_handlers.register_admin_size_edit_handlers()
     admin_stuff_delete_handlers.register_admin_staff_delete_handlers()
     admin_category_create_handlers.register_admin_staff_create_handlers()
     admin_category_update_handlers.register_admin_category_update_handlers()

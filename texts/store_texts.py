@@ -45,7 +45,7 @@ def get_thing_no_color_size_confirmation_text_markup(db: DataBase, stuff_id):
 
 
 def get_thing_color_size_confirmation_text_markup(db: DataBase, colors_sizes_id):
-    data = db.get_stuff_sizes(colors_sizes_id, "stuff_id, price, size")
+    data = db.get_from_stuff_size(colors_sizes_id, "stuff_id, price, size")
     stuff_id, price, size = data
     data = db.get_stuff_info(stuff_id, "name")
     name, = data

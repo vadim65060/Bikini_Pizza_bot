@@ -33,6 +33,7 @@ FIELD_DESCRIPTION_TEXT = 'описание'
 FIELD_COUNT_TEXT = 'количество'
 FIELD_IMAGE_TEXT = 'картинка'
 FIELD_SHOW_TEXT = 'отображение'
+SIZES_EDIT_TEXT = 'размеры'
 FIELD_EDIT_CALLBACK = 'stuff_edit'
 
 DELETE_TEXT = 'удалить'
@@ -49,3 +50,11 @@ INCORRECT_INPUT_TEXT = "Некорректный ввод"
 BACK_BUTTON_TEXT = 'назад'
 
 CATEGORY_NOT_EMPTY_ERROR_TEXT = "Категория не пуста, удаление не возможно"
+
+STUFF_SIZE_PRINT = "размер: {}\n" \
+                   "цена: {}RUB\n"
+
+SIZES_NOT_FOUND = 'размеры товара не найдены, создать размер?'
+ADD_SIZE_TEXT = 'добавить размер'
+SIZE_FIELD_SIZE_TEXT = 'размер'
+GET_SIZE_TEXT = 'введи размер'
