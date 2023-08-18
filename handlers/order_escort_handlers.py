@@ -5,6 +5,7 @@ from callbacks import order_escort_callbacks
 from constants import OrderStates
 from create_db import data_base as db
 from markups import order_escort_markups as OEM
+from middleware import admins
 from texts import order_escort_texts
 
 
@@ -41,6 +42,7 @@ async def issue_order(callback_data: dict):
     await users_bot.send_message(callback_data['user_id'], order_escort_texts.ORDER_ISSUED_USER_TEXT)
 
 
+@admins.check(level=1)
 async def select_next_state(callback: CallbackQuery, callback_data: dict):
     match int(callback_data['state']):
         case OrderStates.ORDER_ACCEPTED.value:
@@ -58,10 +60,12 @@ async def select_next_state(callback: CallbackQuery, callback_data: dict):
     await callback.message.edit_reply_markup(OEM.select_markup(int(callback_data['state']) + 1, callback_data))
 
 
+@admins.check(level=1)
 async def back_state(callback: CallbackQuery, callback_data: dict):
     await callback.message.edit_reply_markup(OEM.select_markup(int(callback_data['state']), callback_data))
 
 
+@admins.check(level=1)
 async def print_yes_no(callback: CallbackQuery, callback_data: dict):
     await callback.message.edit_reply_markup(
         OEM.yes_no_markup(callback.message.reply_markup, callback_data, int(callback_data['state'])))
