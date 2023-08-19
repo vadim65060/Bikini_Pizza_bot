@@ -146,6 +146,8 @@ class AdminDataBase(DataBase):
                              user_id, None, f"user:{user_id}  add stuff {name}")
 
     def delete_stuff(self, user_id: int, stuff_id):
+        self.execute('DELETE FROM purchases WHERE stuff_id = ?', stuff_id)
+        self.execute('DELETE FROM stuff_sizes WHERE stuff_id = ?', stuff_id)
         self.execute("DELETE FROM stuff WHERE id = ?", stuff_id, commit=True)
         self.add_transaction(constants.TransactionTypes.DELETE_STUFF.value,
                              user_id, None, f"user:{user_id}  delete stuff {stuff_id}")
@@ -193,6 +195,7 @@ class AdminDataBase(DataBase):
 
     def delete_stuff_size(self, user_id: int, size_id: int):
         stuff_id, = self.get_from_stuff_size(size_id, 'stuff_id')
+        self.execute('DELETE FROM purchases WHERE stuff_sizes_id = ?', size_id)
         self.execute("DELETE FROM stuff_sizes WHERE id = ?", size_id, commit=True)
         self.add_transaction(constants.TransactionTypes.DELETE_STUFF_SIZE.value,
                              user_id, None, f"user:{user_id}  delete stuff size {size_id}")
