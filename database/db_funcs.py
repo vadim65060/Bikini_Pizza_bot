@@ -726,4 +726,4 @@ class DataBase:
 
 
 if __name__ == '__main__':
-    db = DataBase("mmweek2023db.db")
+    db = DataBase("bot_db.db")

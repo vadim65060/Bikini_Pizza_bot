@@ -8,7 +8,7 @@ from database.db_funcs import DataBase
 CONFIG_TEMPLATE = """{
   "tg_bot_token": "",
   "provider_token": "",
-  "db_path": "database/mmweek2023db.db",
+  "db_path": "database/bot_db.db",
   "orders_chat_id": "",
   "support_chat_id": "",
   "org_bot_token": ""

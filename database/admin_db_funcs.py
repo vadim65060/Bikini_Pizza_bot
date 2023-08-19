@@ -205,4 +205,4 @@ class AdminDataBase(DataBase):
 
 
 if __name__ == '__main__':
-    db = AdminDataBase("mmweek2023db.db")
+    db = AdminDataBase("bot_db.db")
