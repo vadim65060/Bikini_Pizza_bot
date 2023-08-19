@@ -74,7 +74,7 @@ class CachedImages:
         self.bot_name = bot_name
         self.db = db
         self.START_PATH = start_path
-        db.execute("DELETE FROM img_cache where bot_name= ?", bot_name, commit=True)
+        # db.execute("DELETE FROM img_cache where bot_name= ?", bot_name, commit=True)
 
     async def send_cached_img(self, message: Message, path: str, caption: str,
                               reply_markup: InlineKeyboardMarkup,
