@@ -11,7 +11,7 @@ CONFIG_TEMPLATE = """{
   "db_path": "database/bot_db.db",
   "orders_chat_id": "",
   "support_chat_id": "",
-  "org_bot_token": ""
+  "admin_bot_token": ""
 }
 """
 
@@ -24,7 +24,7 @@ class Config:
         self.db_path = None
         self.orders_chat_id = None
         self.support_chat_id = None
-        self.org_bot_token = ""
+        self.admin_bot_token: str = ""
 
         if os.path.exists(config_path):
             self.__load_settings()
@@ -56,7 +56,7 @@ class Config:
             self.db_path = config["db_path"]
             self.orders_chat_id = config["orders_chat_id"]
             self.support_chat_id = config["support_chat_id"]
-            self.org_bot_token = config["org_bot_token"]
+            self.admin_bot_token = config["admin_bot_token"]
 
     def __save_setting(self, setting_name: str, setting):
         try:
