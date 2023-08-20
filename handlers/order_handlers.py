@@ -103,7 +103,7 @@ async def buy(callback: CallbackQuery, state: FSMContext):
                                     need_phone_number=True,
                                     need_shipping_address=pickup_address is None,
                                     is_flexible=pickup_address is None,
-                                    max_tip_amount=50000*100)
+                                    max_tip_amount=50000 * 100)
 
 
 async def shipping_callback(query: ShippingQuery, state: FSMContext) -> None:
@@ -165,8 +165,9 @@ async def pre_checkout_query(pre_checkout_q: types.PreCheckoutQuery, state: FSMC
 
 async def successful_payment(message: Message, state: FSMContext):
     data = await state.get_data()
-    phone = message.successful_payment.order_info.phone_number
-    shipping_address = message.successful_payment.order_info.shipping_address
+    payment = message.successful_payment
+    phone = payment.order_info.phone_number
+    shipping_address = payment.order_info.shipping_address
     if shipping_address:
         address = f'{shipping_address.city} {shipping_address.street_line1} {shipping_address.street_line2}'
     else:
@@ -176,12 +177,11 @@ async def successful_payment(message: Message, state: FSMContext):
     if delivery_cost is None:
         delivery_cost = 0
     comment = data.get('comment')
-    order_id, = db.checkout(message.from_user.id, message.successful_payment.total_amount // 100, balls, delivery_cost,
-                            phone, address, comment)
+    order_id = db.checkout(message.from_user.id, payment.total_amount // 100, balls, delivery_cost, phone, address,
+                           comment, payment.telegram_payment_charge_id, payment.provider_payment_charge_id)
     await order_escort_handlers.print_order(order_id)
     await message.answer(
-        order_texts.ORDER_COMPLETED_TEXT.format(order_id, message.successful_payment.total_amount // 100,
-                                                message.successful_payment.currency),
+        order_texts.ORDER_COMPLETED_TEXT.format(order_id, payment.total_amount // 100, payment.currency),
         reply_markup=menu_markup)
     await state.finish()
 

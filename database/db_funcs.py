@@ -126,6 +126,11 @@ class DataBase:
                                         address       TEXT,
                                         comment       TEXT
                                     )""", commit=True)
+        self.execute("""CREATE TABLE IF NOT EXISTS orders_identifiers (
+                                                order_id            INTEGER PRIMARY KEY REFERENCES orders (id),
+                                                telegram_payment    TEXT,
+                                                provider_payment    TEXT
+                                            )""", commit=True)
 
     def execute(self, clause: str, *args, commit: bool = False, fetch: Union[bool, str] = False) -> Union[list, None]:
         """
@@ -673,7 +678,7 @@ class DataBase:
         return self.execute("SELECT address FROM shops WHERE id = ? AND show = 1", shop_id, fetch='ONE')
 
     def checkout(self, user_id: int, price: int, balls: int, delivery_cost: int, phone: str, address: str,
-                 comment: str):
+                 comment: str, telegram_payment: str, provider_payment: str) -> int:
         purchases_text = self.__purchases_to_text(user_id)
         self.execute(
             "INSERT INTO orders (user_id, stuff_ids, price, used_balls, delivery_cost, phone, address, comment) "
@@ -684,7 +689,10 @@ class DataBase:
             balls = 0
         self.execute("UPDATE users SET money = money - ? + ? WHERE tg_id = ?", balls,
                      int(price * constants.CASHBACK_PERCENT), user_id, commit=True)
-        return self.execute('SELECT MAX(id) FROM orders WHERE user_id = ?', user_id, fetch='ONE')
+        order_id, = self.execute('SELECT MAX(id) FROM orders WHERE user_id = ?', user_id, fetch='ONE')
+        self.execute('INSERT INTO orders_identifiers (order_id, telegram_payment, provider_payment) VALUES (?, ?, ?)',
+                     order_id, telegram_payment, provider_payment, commit=True)
+        return order_id
 
     def get_last_user_order(self, user_id: int, what: str):
         order = self.execute(f"SELECT {what} FROM orders WHERE user_id = ?", user_id, fetch=True)
