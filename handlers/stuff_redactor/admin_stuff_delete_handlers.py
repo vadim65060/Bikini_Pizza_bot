@@ -1,7 +1,10 @@
+import os
+
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
 from validator_collection import checkers
 
+import constants
 from functions.stuff_redactor_functins import exit_check, print_edited_stuff, print_stuff_categories, \
     print_stuff_by_category
 from callbacks import admin_stuff_redactor_callbacks as asr_callbacks
@@ -67,7 +70,9 @@ async def confirm_delete(callback_query: CallbackQuery, state: FSMContext):
 async def delete_stuff(callback_query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     stuff_id = data['stuff_id']
+    img_path = data_base.get_stuff_img_path(stuff_id)
     data_base.delete_stuff(callback_query.from_user.id, stuff_id)
+    os.remove(constants.STORE_PATH + img_path)
     await callback_query.message.delete()
     await callback_query.message.answer(asr_texts.STUFF_DELETED, reply_markup=admin_menu_markups.stuff_redactor_markup)
     await state.finish()
