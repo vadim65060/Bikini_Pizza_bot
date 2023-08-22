@@ -18,7 +18,7 @@ CANCEL_TEXT = "Отмена"
 RESPOND_TEXT = "Снизу есть кнопки меню, можешь их использовать."
 MENU_TEXT = "Добро пожаловать в моё меню! Нажимай на кнопочки снизу 😎"
 
-PROFILE_TEMPLATE = "Баланс: {}\n"
+PROFILE_TEMPLATE = "Bikini coins: {}\n"
 PROFILE_ERROR = "Произошла ошибка - тебя нет в базе данных"
 
 ORDER_TEXT = "Заказать"
@@ -68,24 +68,8 @@ TO_SUPPORT_MESSAGE_TEMPLATE = "Пользователь: @{}\n" \
                               "Вопрос:\n{}"
 
 PROMO_INPUT_REQUEST = "Если у тебя есть промокод, введи его сюда"
-PROMO_SUCCESSFULLY_ACTIVATED_TEMPLATE = "Промокод на {} активирован! Возвращаю тебя в меню 😎"
+PROMO_SUCCESSFULLY_ACTIVATED_TEMPLATE = "Промокод на {} Bikini coins активирован! Возвращаю тебя в меню 😎"
 PROMO_ALREADY_USED = "Ты уже вводил этот промокод, возвращаю тебя в меню"
 PROMO_DOESNT_EXISTS = "Промокод недействителен 😕 Попробуй ещё раз!"
 
 STORE_TEMP_TEXT = "Я ещё не открыл двери своего магазинчика 😉"
-
-# def get_event_text(event: dict):
-#     if not event:
-#         return EVENT_NOT_FOUND_TEXT
-#     week_str = menu_functions.get_weekday_str(event["datetime"])
-#     time_str = dt.datetime.strftime(event["datetime"], "%H:%M")
-#     name = event["name"]
-#     description = event["description"]
-#     res = f"""<b>{name}</b>
-#
-# 📅
-# {week_str.capitalize()} в {time_str}
-#
-# ℹ️
-# {description}"""
-#     return res

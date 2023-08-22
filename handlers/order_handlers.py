@@ -92,9 +92,9 @@ async def buy(callback: CallbackQuery, state: FSMContext):
         prices.append(
             types.LabeledPrice(label=f'{staff[2]} {size_text} {staff[5]}шт.', amount=staff[3] * staff[5] * 100))
     if balls:
-        prices.append(types.LabeledPrice(label=f'Баллы', amount=-balls * 100))
+        prices.append(types.LabeledPrice(label=f'Bikini coins', amount=-balls * 100))
     await callback.bot.send_invoice(callback.message.chat.id,
-                                    title='заказ в Bikini pizza',
+                                    title='заказ в Bikini Pizza',
                                     description=pickup_address if pickup_address else 'доставка',
                                     provider_token=config.provider_token,
                                     currency='rub',

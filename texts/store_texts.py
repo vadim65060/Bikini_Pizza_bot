@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from callbacks.store_callbacks import ITEM_CB, BUY_NO_COLORS_SIZES_CB, BUY_COLORS_SIZES_CB, \
     BUY_CONFIRM_COLORS_SIZES_CB, BUY_CONFIRM_NO_COLORS_SIZES_CB
 
-STORE_CATEGORIES_WITH_TUC_TEMPLATE = "Сейчас у тебя <b>{}</b> деняк.\n\nВыбери категорию:"
+STORE_CATEGORIES_WITH_TUC_TEMPLATE = "Сейчас у тебя <b>{}</b> Bikini coins.\n\nВыбери категорию:"
 
 THING_NOT_FOUND_TEXT = "К сожалению, я не нашёл этот товар у себя на складе."
 THING_HID = "Я тебе не покажу этот товар."
@@ -73,7 +73,7 @@ def get_thing_color_size_text_markup(db: DataBase, stuff_id, tg_id):
         text = THING_HID
         return text, markup
     combinations = db.get_all_size_combinations(stuff_id)
-    #count = db.get_stuff_count_num_by_stuff_id(stuff_id)
+    # count = db.get_stuff_count_num_by_stuff_id(stuff_id)
 
     if not description:
         description = ""

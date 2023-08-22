@@ -20,8 +20,8 @@ EDIT_PHONE_BUTTON_TEXT = 'изменить номер'
 EDIT_ADDRESS_BUTTON_TEXT = 'изменить адресс'
 ORDER_BUTTON_TEXT = 'заказать'
 CANCEL_BUTTON_TEXT = 'отмена'
-USE_BALLS_BUTTON_TEXT = 'использовать баллы'
-ADD_COMMENT_TEXT = 'добавить комментарий'
+USE_BALLS_BUTTON_TEXT = 'баллы'
+ADD_COMMENT_TEXT = 'комментарий'
 DELIVERY_ZONE_BUTTON_TEXT = 'Зоны доставки'
 DELIVERY_ZONE_URL = 'https://yandex.ru/maps/?um=constructor' \
                     '%3A38e7ac5af51607ab4e996b58fe775240204ebf377075397488c961da2eae134d&source=constructorLink'
@@ -33,7 +33,7 @@ def get_order_text(db: DataBase, tg_id: int, balls: int, pickup_address: str, co
     text, price = get_profile_text(db, tg_id, False)
     if balls:
         price = max(1, price - balls)
-        text += f'использованные баллы - {balls}\n'
+        text += f'Bikini coins - {balls}\n'
 
     text += f'---------------\n'
     text += f'Итого: {price}RUB\n'

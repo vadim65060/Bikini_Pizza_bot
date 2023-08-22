@@ -26,7 +26,7 @@ def get_profile_text(order_id, purchases, order_info, username):
             text += f" {size}"
         text += f" {count}шт - {price * count}RUB\n"
     text += f'Доставка - {order_info[3]}RUB\n'
-    text += f'Баллы - {order_info[2] if order_info[2] is not None else 0}\n'
+    text += f'Bikini coins - {order_info[2] if order_info[2] is not None else 0}\n'
     text += f'---------------\n' \
             f'Итого: {order_info[1]}\n\n'
     text += 'Телефон: '

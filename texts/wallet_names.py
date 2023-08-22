@@ -1,4 +1,4 @@
 # Название валюты
-WALLET_SINGULAR = "мнимая единица"
-WALLET_PLURAL = "мнимые единицы"
-WALLET_GENITIVE = "мнимых единиц"
+WALLET_SINGULAR = "Bikini coins"
+WALLET_PLURAL = "Bikini coins"
+WALLET_GENITIVE = "Bikini coins"

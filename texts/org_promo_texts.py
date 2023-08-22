@@ -20,10 +20,10 @@ NUM_USES_ERROR_PROMO_TEXT = "Пожалуйста, введи целое пол�
 PERIOD_PROMO_TEXT = "Введи срок действия промокода в часах (например: 3ч) или в днях (например: 1д)"
 PERIOD_ERROR_PROMO_TEXT = "Пожалуйста, введи срок действия в формате \"(целое число >0)ч\" или \"(целое число >0)д\""
 
-PROMO_ADDED_TEMPLATE = "Создан промокод \'<code>{}</code>\' на сумму {}i\n\n"
+PROMO_ADDED_TEMPLATE = "Создан промокод \'<code>{}</code>\' на сумму {} Bikini coins\n\n"
 PROMO_ADDED_INFO_TEMPLATE = "Срок действия: <b>{}</b>\n" \
                             "Число применений: <b>{}</b>"
-PROMO_TO_LIST_TEMPLATE = "Промокод \'<code>{}</code>\' на сумму {}i.\n"
+PROMO_TO_LIST_TEMPLATE = "Промокод \'<code>{}</code>\' на сумму {} Bikini coins.\n"
 PROMO_TO_LIST_INFO_TEMPLATE = "Срок действия: до <b>{}</b>\n" \
                               "Число применений: <b>{}</b>"
 INFINITE_USES_TEXT = "не ограничено"
