@@ -78,7 +78,7 @@ def get_thing_color_size_text_markup(db: DataBase, stuff_id, tg_id):
     if not description:
         description = ""
     else:
-        description += "\n\n"
+        description = "<b>Состав:</b>\n" + description + "\n\n"
     text = f"<b>{name}</b>\n\n{description}"
     if combinations:
         text += "<b>Размеры:</b>\n"
@@ -114,7 +114,7 @@ def get_thing_no_color_size_text_markup(db: DataBase, stuff_id, tg_id):
     if not description:
         description = ""
     else:
-        description += "\n\n"
+        description = "<b>Состав:</b>\n" + description + "\n\n"
     text = f"<b>{name}</b>\n\n{description}" \
            f"Цена: {price}RUB"
     booked = db.how_many_stuff_booked(tg_id, stuff_id)
