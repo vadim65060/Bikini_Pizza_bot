@@ -170,6 +170,8 @@ async def calculate_shipping(callback: CallbackQuery, state: FSMContext):
     balls = data.get('balls')
     price = db.get_order_sum(callback.from_user.id) - (balls if balls else 0)
     location = data.get('location')
+    if location is None:
+        location = geocoder.coordinates(data.get('address'))
     delivery_price, delivery_description = await delivery_calculator.get_delivery_price(location, price)
     await state.update_data({'delivery_cost': delivery_price})
     return delivery_price, delivery_description
