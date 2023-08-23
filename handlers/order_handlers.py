@@ -38,7 +38,7 @@ async def order_start(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer('Оформление заказа', reply_markup=order_markups.back_markup)
     if last_order:
         if db.is_shop(last_order[0].replace(' (самовывоз)', '')):
-            await state.update_data({'pickup_address': last_order[0]})
+            await state.update_data({'pickup_address': last_order[0].replace(' (самовывоз)', '')})
         else:
             await state.update_data({'address': last_order[0]})
         await print_order(callback.message, state, callback.from_user.id)
@@ -54,10 +54,15 @@ async def get_address(message: Message | CallbackQuery):
     await OrderState.get_address.set()
 
 
+async def get_location(callback: CallbackQuery):
+    await callback.message.answer('loc', reply_markup=order_markups.location_markup)
+
+
 async def set_location(message: Message, state: FSMContext):
     await state.update_data({'location': message.location})
     await state.update_data({'address': None})
     await state.update_data({'pickup_address': None})
+    await message.answer('локация получена', reply_markup=order_markups.back_markup)
     await print_order(message, state)
 
 
@@ -254,7 +259,8 @@ def register_order_handlers():
     dp.register_callback_query_handler(order_start,
                                        CallbackData(menu_callbacks.ORDER_CB).filter(),
                                        state=None)
-
+    dp.register_callback_query_handler(get_location, CallbackData(order_callbacks.GET_LOCATION_CB).filter(),
+                                       state=OrderState.get_address)
     dp.register_message_handler(set_address, state=OrderState.get_address)
     dp.register_message_handler(set_location, content_types=ContentTypes.LOCATION,
                                 state=OrderState.get_address)

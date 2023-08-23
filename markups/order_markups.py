@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 
 from database.db_funcs import DataBase
 from texts import order_texts
@@ -9,7 +9,10 @@ from callbacks import order_callbacks
 back_markup = ReplyKeyboardMarkup(resize_keyboard=True).add(order_texts.BACK_TEXT)
 
 pickup_markup = InlineKeyboardMarkup()
-pickup_markup.add(InlineKeyboardButton(order_texts.PICKUP_TEXT, callback_data=order_callbacks.PICKUP_CB))
+pickup_markup.add(InlineKeyboardButton(order_texts.PICKUP_TEXT, callback_data=order_callbacks.PICKUP_CB),
+                  InlineKeyboardButton(order_texts.GET_LOCATION_TEXT, callback_data=order_callbacks.GET_LOCATION_CB))
+location_markup = ReplyKeyboardMarkup(resize_keyboard=True).add(order_texts.BACK_TEXT)
+location_markup.add(KeyboardButton(order_texts.GET_LOCATION_TEXT, request_location=True))
 
 
 def get_order_markup(pickup):

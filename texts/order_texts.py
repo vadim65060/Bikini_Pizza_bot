@@ -8,6 +8,7 @@ WRONG_ADDRESS_TEXT = "Попробуй ввести адрес по-другом
 
 BACK_TEXT = 'назад'
 
+GET_LOCATION_TEXT = 'геопозиция'
 PICKUP_TEXT = 'самовывоз'
 DELIVERY_TEXT = 'доставка'
 SELECT_SHOP_ADDRESSES_TEXT = "Выбери место самовывоза"
