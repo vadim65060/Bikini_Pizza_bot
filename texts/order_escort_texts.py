@@ -18,6 +18,10 @@ ORDER_DELIVERED_USER_TEXT = 'Ваш заказ доставлен!\nПриятн
 
 
 def get_profile_text(order_id, purchases, order_info, username):
+    total_price = 0
+    coins = order_info[2]
+    if order_info[2] is None:
+        coins = 0
     text = f'Заказ №{order_id}\n\n'
     text += 'Состав:\n'
     for stuff_id, stuff_sizes_id, name, price, size, count in purchases:
@@ -25,8 +29,11 @@ def get_profile_text(order_id, purchases, order_info, username):
         if size:
             text += f" {size}"
         text += f" {count}шт - {price * count}RUB\n"
+        total_price += price * count
     text += f'Доставка - {order_info[3]}RUB\n'
-    text += f'Bikini coins - {order_info[2] if order_info[2] is not None else 0}\n'
+    if order_info[1] - total_price - coins > 0:
+        text += f'Чаевые - {order_info[1] - total_price - coins}RUB\n'
+    text += f'Bikini coins - {coins}\n'
     text += f'---------------\n' \
             f'Итого: {order_info[1]}\n\n'
     text += 'Телефон: '
