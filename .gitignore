@@ -1,4 +1,6 @@
 /config.json
 /database/bot_db.db
+/misc/store/categories
+/misc/store/stuff
 .idea
 venv
