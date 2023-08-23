@@ -2,7 +2,7 @@ from aiogram.utils.callback_data import CallbackData
 
 SHOP_ADDRESSES_CB = CallbackData("show_address", "shop_id")
 
-
+ADDRESS_CHECK_CB = 'address_check'
 ORDER_CB = 'complete_order'
 CANCEL_CB = 'cancel'
 PICKUP_CB = 'pickup'

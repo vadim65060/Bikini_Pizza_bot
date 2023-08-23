@@ -1,4 +1,5 @@
 from functools import lru_cache
+from decimal import Decimal
 
 from yandex_geocoder import Client
 
@@ -11,3 +12,8 @@ def coordinates(address: str):
     if address.lower().find(city) == -1:
         address = city + ' ' + address
     return client.coordinates(address)
+
+
+@lru_cache()
+def address(longitude: Decimal, latitude: Decimal) -> str:
+    return client.address(longitude, latitude)

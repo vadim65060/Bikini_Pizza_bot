@@ -24,6 +24,9 @@ def get_order_markup(pickup):
                      InlineKeyboardButton(order_texts.CANCEL_BUTTON_TEXT, callback_data=order_callbacks.CANCEL_CB))
     order_markup.add(InlineKeyboardButton(order_texts.DELIVERY_ZONE_BUTTON_TEXT, url=order_texts.DELIVERY_ZONE_URL),
                      delivery_button)
+    if not pickup:
+        order_markup.add(
+            InlineKeyboardButton(order_texts.EDIT_ADDRESS_BUTTON_TEXT, callback_data=order_callbacks.DELIVERY_CB))
     order_markup.add(InlineKeyboardButton(order_texts.ORDER_BUTTON_TEXT, callback_data=order_callbacks.ORDER_CB))
     return order_markup
 

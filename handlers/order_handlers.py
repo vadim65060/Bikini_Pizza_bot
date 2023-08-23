@@ -1,20 +1,21 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext, filters
-from aiogram.types import Message, CallbackQuery, ParseMode, ContentType, ShippingOption, LabeledPrice, ShippingQuery
+from aiogram.types import Message, CallbackQuery, ParseMode, ContentType, ContentTypes, Location
 from aiogram.utils.callback_data import CallbackData
 from validator_collection import checkers
 
+import constants
 from bot_create import dp, config
-from callbacks import menu_callbacks, order_callbacks
+from callbacks import menu_callbacks, order_callbacks, callbacks_templates
 from create_db import data_base as db
 from delivery import geocoder
 from delivery.delivery_calculator import delivery_calculator
 from fsm.menu_fsm import OrderState
+from handlers import order_escort_handlers
 from handlers.menu_handlers import send_menu_on_update
-from markups import order_markups
+from markups import order_markups, markups_templates
 from markups.menu_markups import menu_markup
 from texts import order_texts
-from handlers import order_escort_handlers
 
 BUY_PAYLOAD = 'buy_payload'
 
@@ -33,8 +34,53 @@ async def back_to_menu(update: Message | CallbackQuery, state: FSMContext):
 
 
 async def order_start(callback: CallbackQuery, state: FSMContext):
+    last_order = db.get_last_user_order(callback.from_user.id, 'address')
     await callback.message.answer('Оформление заказа', reply_markup=order_markups.back_markup)
-    await print_order(callback.message, state, callback.from_user.id)
+    if last_order:
+        if db.is_shop(last_order[0].replace(' (самовывоз)', '')):
+            await state.update_data({'pickup_address': last_order[0]})
+        else:
+            await state.update_data({'address': last_order[0]})
+        await print_order(callback.message, state, callback.from_user.id)
+    else:
+        await get_address(callback.message)
+
+
+async def get_address(message: Message | CallbackQuery):
+    if isinstance(message, CallbackQuery):
+        await message.message.edit_text(order_texts.GET_ADDRESS_TEXT, reply_markup=order_markups.pickup_markup)
+    else:
+        await message.answer(order_texts.GET_ADDRESS_TEXT, reply_markup=order_markups.pickup_markup)
+    await OrderState.get_address.set()
+
+
+async def set_location(message: Message, state: FSMContext):
+    await state.update_data({'location': message.location})
+    await state.update_data({'address': None})
+    await state.update_data({'pickup_address': None})
+    await print_order(message, state)
+
+
+async def set_address(message: Message, state: FSMContext):
+    if await back_check(message, state):
+        return
+
+    location = geocoder.coordinates(message.text)
+    await message.answer_location(location[1], location[0])
+    await state.update_data({'address': message.text})
+    await state.update_data({'location': location})
+    await message.answer(order_texts.CHECK_ADDRESS_TEXT,
+                         reply_markup=markups_templates.get_yes_no_markup(order_callbacks.ADDRESS_CHECK_CB))
+
+
+async def confirm_address(callback: CallbackQuery, state: FSMContext):
+    await state.update_data({'pickup_address': None})
+    await print_order(callback, state)
+
+
+async def wrong_address(callback: CallbackQuery):
+    await callback.message.delete_reply_markup()
+    await callback.message.edit_text(order_texts.WRONG_ADDRESS_TEXT)
 
 
 async def select_pickup_address(callback: CallbackQuery):
@@ -45,12 +91,14 @@ async def select_pickup_address(callback: CallbackQuery):
 
 async def set_pickup_address(callback: CallbackQuery, state: FSMContext, callback_data: dict):
     await state.update_data({'pickup_address': db.get_shop_address(int(callback_data['shop_id']))[0]})
+    await state.update_data({'address': None})
+    await state.update_data({'location': None})
     await print_order(callback, state, callback.from_user.id)
 
 
 async def off_pickup(callback: CallbackQuery, state: FSMContext):
     await state.update_data({'pickup_address': None})
-    await print_order(callback, state, callback.from_user.id)
+    await get_address(callback)
 
 
 async def select_balls_to_use(callback: CallbackQuery):
@@ -86,7 +134,15 @@ async def buy(callback: CallbackQuery, state: FSMContext):
     balls = data.get('balls')
     pickup_address = data.get('pickup_address')
     booked_list = db.booked_list(callback.from_user.id)
+    delivery_price = 0
     prices = []
+    if pickup_address is None:
+        delivery_price, delivery_description = await calculate_shipping(callback, state)
+        if delivery_price is None:
+            await callback.message.answer(order_texts.ORDER_DELIVERY_ERROR_TEXT.format(delivery_description))
+            return
+        prices.append(types.LabeledPrice(label='Доставка', amount=delivery_price * 100))
+
     for staff in booked_list:
         size_text = staff[4] if staff[4] is not None else ''
         prices.append(
@@ -95,39 +151,23 @@ async def buy(callback: CallbackQuery, state: FSMContext):
         prices.append(types.LabeledPrice(label=f'Bikini coins', amount=-balls * 100))
     await callback.bot.send_invoice(callback.message.chat.id,
                                     title='заказ в Bikini Pizza',
-                                    description=pickup_address if pickup_address else 'доставка',
+                                    description=pickup_address if pickup_address else f'доставка {delivery_price}RUB',
                                     provider_token=config.provider_token,
                                     currency='rub',
                                     prices=prices,
                                     payload=BUY_PAYLOAD,
                                     need_phone_number=True,
-                                    need_shipping_address=pickup_address is None,
-                                    is_flexible=pickup_address is None,
-                                    max_tip_amount=50000 * 100)
+                                    max_tip_amount=constants.MAX_TIPS * 100)
 
 
-async def shipping_callback(query: ShippingQuery, state: FSMContext) -> None:
-    if query.invoice_payload != BUY_PAYLOAD:
-        await query.bot.answer_shipping_query(query.id, ok=False, error_message="Something went wrong...")
-        return
-
+async def calculate_shipping(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     balls = data.get('balls')
-    price = db.get_order_sum(query.from_user.id) - (balls if balls else 0)
-    shipping_address = query.shipping_address
-    shipping_address_text = f'{shipping_address.city} {shipping_address.street_line1} {shipping_address.street_line2}'
-    location = geocoder.coordinates(shipping_address_text)
+    price = db.get_order_sum(callback.from_user.id) - (balls if balls else 0)
+    location = data.get('location')
     delivery_price, delivery_description = await delivery_calculator.get_delivery_price(location, price)
-    print(delivery_price)
-    print(delivery_description)
-    if delivery_price is None:
-        await query.bot.answer_shipping_query(query.id, ok=False, error_message=delivery_description)
-        return
-
-    options = list()
-    options.append(ShippingOption('0', 'Доставка курьером', [LabeledPrice('Доставка', delivery_price * 100)]))
     await state.update_data({'delivery_cost': delivery_price})
-    await query.bot.answer_shipping_query(query.id, ok=True, shipping_options=options)
+    return delivery_price, delivery_description
 
 
 @dp.pre_checkout_query_handler(lambda query: True, state='*')
@@ -167,11 +207,7 @@ async def successful_payment(message: Message, state: FSMContext):
     data = await state.get_data()
     payment = message.successful_payment
     phone = payment.order_info.phone_number
-    shipping_address = payment.order_info.shipping_address
-    if shipping_address:
-        address = f'{shipping_address.city} {shipping_address.street_line1} {shipping_address.street_line2}'
-    else:
-        address = data.get('pickup_address') + ' (самовывоз)'
+    address = (data.get('pickup_address') + ' (самовывоз)') if data.get('pickup_address') else data.get('address')
     balls = data.get('balls')
     delivery_cost = data.get('delivery_cost')
     if delivery_cost is None:
@@ -190,11 +226,16 @@ async def print_order(update: Message | CallbackQuery, state: FSMContext, user_i
     await OrderState.print_order.set()
     data = await state.get_data()
     pickup_address = data.get('pickup_address')
+    address = data.get('address')
+    location: Location = data.get('location')
+    if not pickup_address and not address:
+        address = geocoder.address(location.longitude, location.latitude)
+        await state.update_data({'address': address})
     balls = data.get('balls')
     comment = data.get('comment')
     if user_id is None:
         user_id = update.from_user.id
-    text = order_texts.get_order_text(db, user_id, balls, pickup_address, comment)
+    text = order_texts.get_order_text(db, user_id, balls, pickup_address, address, comment)
     if isinstance(update, CallbackQuery):
         await update.message.edit_text(text, reply_markup=order_markups.get_order_markup(pickup_address),
                                        parse_mode=ParseMode.HTML)
@@ -214,9 +255,21 @@ def register_order_handlers():
                                        CallbackData(menu_callbacks.ORDER_CB).filter(),
                                        state=None)
 
+    dp.register_message_handler(set_address, state=OrderState.get_address)
+    dp.register_message_handler(set_location, content_types=ContentTypes.LOCATION,
+                                state=OrderState.get_address)
+    dp.register_callback_query_handler(confirm_address,
+                                       callbacks_templates.YES_NO_CB.filter(
+                                           payload=order_callbacks.ADDRESS_CHECK_CB, yes='1'),
+                                       state=OrderState.get_address)
+    dp.register_callback_query_handler(wrong_address,
+                                       callbacks_templates.YES_NO_CB.filter(
+                                           payload=order_callbacks.ADDRESS_CHECK_CB, yes='0'),
+                                       state=OrderState.get_address)
+
     dp.register_callback_query_handler(select_pickup_address,
                                        CallbackData(order_callbacks.PICKUP_CB).filter(),
-                                       state=OrderState.print_order)
+                                       state=[OrderState.print_order, OrderState.get_address])
     dp.register_callback_query_handler(set_pickup_address,
                                        order_callbacks.SHOP_ADDRESSES_CB.filter(),
                                        state=OrderState.select_pickup_address)
@@ -238,5 +291,4 @@ def register_order_handlers():
     dp.register_callback_query_handler(buy,
                                        CallbackData(order_callbacks.ORDER_CB).filter(),
                                        state=OrderState.print_order)
-    dp.register_shipping_query_handler(shipping_callback, state='*')
     dp.register_message_handler(successful_payment, content_types=ContentType.SUCCESSFUL_PAYMENT, state='*')

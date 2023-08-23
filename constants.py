@@ -26,8 +26,7 @@ DELIVERY_SETTINGS_FILE = 'delivery/delivery_settings.json'
 
 PERIOD_TYPES = ['ч', 'д']
 
-LETTERING_ADMIN_ID = 769074534
-
+MAX_TIPS = 50000
 CASHBACK_PERCENT = 0.05
 
 
