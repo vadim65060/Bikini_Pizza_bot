@@ -114,7 +114,7 @@ async def add_user_balls(message: Message):
 
 
 def register_admin_menu_handlers():
-    admin_dp.register_message_handler(add_user_balls, commands=['AddBalls'], ignore_case=True, state='*')
+    admin_dp.register_message_handler(add_user_balls, commands=['AddBalls', 'addballs'], state='*')
     # org_merch_issuance_handlers.register_merch_issuance_handlers()
     admin_dp.register_message_handler(send_menu_on_update,
                                       text=admin_menu_texts.BACK_TO_MENU_BUTTON_TEXT,
