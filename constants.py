@@ -59,10 +59,7 @@ class TransactionTypes(Enum):
     PURCHASE_SUCCESS = "purchase_success"
     PURCHASE_FAIL = "purchase_fail"
     ADMIN_TAKE_OUT = "admin_take_out"
-    ISSUE_MERCH = "merch_issue"
-    MERCH_RETURN_BACK = "merch_return_back"
-    ISSUE_MERCH_FAIL = "issue_merch_fail"
-    MERCH_RETURN_BACK_FAIL = "merch_return_back_fail"
+    UPDATE_USER_DATA = "update_user_data"
 
 
 HELP_TEXT = """<b>Справка по боту</b>"""

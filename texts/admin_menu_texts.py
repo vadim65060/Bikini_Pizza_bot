@@ -21,3 +21,7 @@ BACK_TO_MENU_TEXT = "Возвращаю в мейн меню \n" \
 TAKE_OUT_ACCESS_USERNAME_INPUT_TEXT = "Пожалуйста, введите username человека, у которого вы ходите забрать доступ"
 TAKE_OUT_ACCESS_DONE_TEMPLATE = "Вы успешно забрали доступ у @{}"
 TAKE_OUT_ACCESS_NOT_FOUND_TEXT = "Этого человека нет в админах 😥"
+
+ADD_USER_BALLS_COMMAND = 'Пользователю @{} добавлено {} баллов'
+INCORRECT_COMMAND_TEXT = 'Некорректная команда\n'
+USER_NOT_FOUND = 'Пользователь @{} не найден'

@@ -3,6 +3,7 @@ from typing import Union
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message, ParseMode, ReplyKeyboardMarkup
 from magic_filter import F
+from validator_collection import checkers
 
 import constants
 from admin_bot_create import admin_dp, data_base
@@ -95,7 +96,25 @@ async def show_promo_list(message: Message, state: FSMContext):
         await message.answer(text, parse_mode=ParseMode.HTML)
 
 
+@admins.check(level=3)
+async def add_user_balls(message: Message):
+    parameters = message.text.split()[1:]
+    if len(parameters) < 2:
+        await message.answer(admin_menu_texts.INCORRECT_COMMAND_TEXT + message.text)
+        return
+    if parameters[0][0] == '@' or not checkers.is_integer(parameters[1]):
+        parameters[0] = parameters[0][1:]
+    user_id = data_base.get_user_id_by_username(parameters[0])
+    if user_id is None:
+        await message.answer(admin_menu_texts.USER_NOT_FOUND.format(parameters[0]))
+        return
+    user_balls, = data_base.get_user_info(user_id, 'money')
+    data_base.update_user_data(message.from_user.id, user_id, 'money', user_balls + int(parameters[1]))
+    await message.answer(admin_menu_texts.ADD_USER_BALLS_COMMAND.format(parameters[0], int(parameters[1])))
+
+
 def register_admin_menu_handlers():
+    admin_dp.register_message_handler(add_user_balls, commands=['AddBalls'], ignore_case=True, state='*')
     # org_merch_issuance_handlers.register_merch_issuance_handlers()
     admin_dp.register_message_handler(send_menu_on_update,
                                       text=admin_menu_texts.BACK_TO_MENU_BUTTON_TEXT,

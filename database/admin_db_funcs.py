@@ -165,9 +165,9 @@ class AdminDataBase(DataBase):
 
     def __update_table_value(self, user_id: int, table: str, what: str, column_name: str, item: str | int,
                              value: int | str, transaction_type: constants.TransactionTypes):
-        self.execute(f"UPDATE {table} SET {what} = ? WHERE {column_name} = ?", value, item, fetch="one")
+        self.execute(f"UPDATE {table} SET {what} = ? WHERE {column_name} = ?", value, item, commit=True)
         self.add_transaction(transaction_type.value, user_id, None,
-                             f"user:{user_id}  update {table} {what} to {value}")
+                             f"user: {user_id}  update {table} {what} to {value}")
 
     def update_stuff(self, user_id: int, what: str, stuff_id: int, value: int | str | None):
         self.__update_table_value(user_id, 'stuff', what, 'id', stuff_id, value,
@@ -202,6 +202,11 @@ class AdminDataBase(DataBase):
         sizes = self.get_sizes_info_by_staff_id(stuff_id, 'id')
         if len(sizes) == 0:
             self.update_stuff(user_id, 'count', stuff_id, 9999)
+
+    def update_user_data(self, admin_id: int, user_id: int, what: str, value: int | str):
+        self.execute(f"UPDATE users SET {what} = ? WHERE tg_id = ?", value, user_id, commit=True)
+        self.add_transaction(constants.TransactionTypes.UPDATE_USER_DATA.value, admin_id, user_id,
+                             f"admin: {user_id} update user: {user_id} {what} to {value}")
 
 
 if __name__ == '__main__':
