@@ -113,10 +113,10 @@ async def select_balls_to_use(callback: CallbackQuery):
 
 async def set_balls_to_use(message: Message, state: FSMContext):
     price = db.get_order_sum(message.from_user.id)
-    min_price = 1
     user_balance, = db.get_user_info(message.from_user.id, 'money')
-    if not checkers.is_integer(message.text, minimum=0, maximum=max(min(user_balance, price - min_price), 0)):
-        await message.answer(order_texts.INCORRECT_INPUT_NUM_TEXT.format(max(min(user_balance, price - min_price), 0)))
+    balls_limit = max(min(user_balance, int(price * constants.BALLS_USING_LIMIT_PERCENT)), 0)
+    if not checkers.is_integer(message.text, minimum=0, maximum=balls_limit):
+        await message.answer(order_texts.INCORRECT_INPUT_NUM_TEXT.format(balls_limit))
         return
 
     await state.update_data({'balls': int(message.text)})

@@ -27,6 +27,7 @@ DELIVERY_SETTINGS_FILE = 'delivery/delivery_settings.json'
 PERIOD_TYPES = ['ч', 'д']
 
 MAX_TIPS = 50000
+BALLS_USING_LIMIT_PERCENT = 0.5
 CASHBACK_PERCENT = 0.05
 
 
