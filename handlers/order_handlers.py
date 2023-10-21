@@ -55,7 +55,7 @@ async def get_address(message: Message | CallbackQuery):
 
 
 async def get_location(callback: CallbackQuery):
-    await callback.message.answer('loc', reply_markup=order_markups.location_markup)
+    await callback.message.answer('Отправь свою локацию (кнопка внизу)', reply_markup=order_markups.location_markup)
 
 
 async def set_location(message: Message, state: FSMContext):
