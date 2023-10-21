@@ -1,9 +1,10 @@
 from functools import lru_cache
 from decimal import Decimal
 
+from bot_create import config
 from yandex_geocoder import Client
 
-client = Client("e3bce2b1-53dc-4e02-a181-76a5c208c3ec")
+client = Client(config.geocoder_token)
 city = 'калининград'.lower()
 
 

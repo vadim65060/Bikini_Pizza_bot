@@ -11,7 +11,8 @@ CONFIG_TEMPLATE = """{
   "db_path": "database/bot_db.db",
   "orders_chat_id": "",
   "support_chat_id": "",
-  "admin_bot_token": ""
+  "admin_bot_token": "",
+  "geocoder_token": ""
 }
 """
 
@@ -25,6 +26,7 @@ class Config:
         self.orders_chat_id = None
         self.support_chat_id = None
         self.admin_bot_token: str = ""
+        self.geocoder_token: str = ""
 
         if os.path.exists(config_path):
             self.__load_settings()
@@ -53,6 +55,9 @@ class Config:
             self.provider_token = config['provider_token']
             if not self.provider_token:
                 raise ValueError("Токен платежей не указан. Добавьте его в config.json")
+            self.geocoder_token = config['geocoder_token']
+            if not self.geocoder_token:
+                raise ValueError("geocoder токен не указан. Добавьте его в config.json")
             self.db_path = config["db_path"]
             self.orders_chat_id = config["orders_chat_id"]
             self.support_chat_id = config["support_chat_id"]
