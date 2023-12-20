@@ -17,13 +17,13 @@ def get_size_color_thing_has_bought_text(db: DataBase, colors_sizes_id):
     stuff_id, size = db.get_stuff_sizes_texts_info(colors_sizes_id, "stuff_id, size")
     name, = db.get_stuff_info(stuff_id, "name")
     if not size:
-        return f"{name} - хороший выбор. Поздравляю тебя с покупкой."
-    return f"{name} {size} - хороший выбор. Поздравляю тебя с покупкой."
+        return f"{name} - хороший выбор. Товар добавлен в корзину."
+    return f"{name} {size} - хороший выбор. Товар добавлен в корзину."
 
 
 def get_no_size_color_thing_has_bought_text(db: DataBase, stuff_id):
     name, = db.get_stuff_info(stuff_id, "name")
-    return f"{name} - хороший выбор. Поздравляю тебя с покупкой."
+    return f"{name} - хороший выбор. Товар добавлен в корзину."
 
 
 def get_thing_no_color_size_confirmation_text_markup(db: DataBase, stuff_id):

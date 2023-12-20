@@ -59,7 +59,7 @@ def get_user_basket_text(booked_list, print_sum=True):
 
 MESSAGE_CANT_BE_EDITED_TEXT = "Сообщение не редактируется :("
 
-FAQ_TEXT = 'FAQ_TEXT'
+FAQ_TEXT = 'Пока тут ничего нет, задавай вопросы в поддержку'
 HELP_INPUT_REQUEST = "Введи свой вопрос"
 HELP_MESSAGE_SENT = "Запрос отправлен, возвращаю тебя в меню"
 BACK_TO_MENU_TEXT = "Хорошо, возвращаю тебя в меню"
