@@ -107,7 +107,12 @@ async def off_pickup(callback: CallbackQuery, state: FSMContext):
 
 
 async def select_balls_to_use(callback: CallbackQuery):
-    await callback.message.edit_text(order_texts.BALLS_TEXT, reply_markup=None)
+    price = db.get_order_sum(callback.from_user.id)
+    user_balance, = db.get_user_info(callback.from_user.id, 'money')
+    balls_limit = max(0,
+                      min(user_balance, int(price * constants.BALLS_USING_LIMIT_PERCENT),
+                          price - constants.PROVIDER_MIN_PRICE))
+    await callback.message.edit_text(order_texts.BALLS_TEXT.format(balls_limit), reply_markup=None)
     await OrderState.balls_select.set()
 
 
