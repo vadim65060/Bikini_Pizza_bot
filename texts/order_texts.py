@@ -30,6 +30,8 @@ ORDER_DELIVERY_ERROR_TEXT = 'Доставка невозможна\n' \
                             'Комментарий: {}'
 ORDER_COMPLETED_TEXT = "Заказ №{} на сумму {} {} получен, ожидайте ответ."
 
+DELIVERY_BLOCKED_TEXT = 'доставка временно отключена, используйте самовывоз'
+
 
 def get_order_text(db: DataBase, tg_id: int, balls: int, pickup_address: str, address: str, comment: str | None):
     text, price = get_profile_text(db, tg_id, False)

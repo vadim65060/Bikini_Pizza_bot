@@ -114,7 +114,9 @@ async def select_balls_to_use(callback: CallbackQuery):
 async def set_balls_to_use(message: Message, state: FSMContext):
     price = db.get_order_sum(message.from_user.id)
     user_balance, = db.get_user_info(message.from_user.id, 'money')
-    balls_limit = max(min(user_balance, int(price * constants.BALLS_USING_LIMIT_PERCENT)), 0)
+    balls_limit = max(0,
+                      min(user_balance, int(price * constants.BALLS_USING_LIMIT_PERCENT),
+                          price - constants.PROVIDER_MIN_PRICE))
     if not checkers.is_integer(message.text, minimum=0, maximum=balls_limit):
         await message.answer(order_texts.INCORRECT_INPUT_NUM_TEXT.format(balls_limit))
         return
@@ -142,6 +144,9 @@ async def buy(callback: CallbackQuery, state: FSMContext):
     delivery_price = 0
     prices = []
     if pickup_address is None:
+        if constants.BLOCK_DELIVERY:
+            await callback.message.answer(order_texts.DELIVERY_BLOCKED_TEXT)
+            return
         delivery_price, delivery_description = await calculate_shipping(callback, state)
         if delivery_price is None:
             await callback.message.answer(order_texts.ORDER_DELIVERY_ERROR_TEXT.format(delivery_description))
