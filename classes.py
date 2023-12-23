@@ -89,7 +89,10 @@ class CachedImages:
         img_id = self.db.execute("SELECT img_id FROM img_cache WHERE path = ? AND bot_name = ?", res_path,
                                  self.bot_name, fetch="one")
         if not img_id:
-            res = res_path
+            if os.path.exists(res_path):
+                res = res_path
+            else:
+                res = 'misc/store/logo.jpg'
         else:
             res, = img_id
         if message_edit:
