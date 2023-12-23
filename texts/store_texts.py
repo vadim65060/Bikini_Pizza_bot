@@ -148,10 +148,10 @@ def get_category_list_text_markup(db: DataBase, category_id, tg_id):
         if with_colors_sizes:
             sizes = db.get_all_sizes_by_stuff_id(stuff_id)
             if sizes:
-                text += f"  (" + ", ".join([f'{size} - {price}RUB' for color_sizes_id, size, price in sizes]) + ")\n"
+                text += f" от <i>{min([price for color_sizes_id, size, price in sizes])}RUB</i>\n"
                 price_output = False
         if price_output:
-            text += f" — {price}RUB\n"
+            text += f" — <i>{price}RUB</i>\n"
         # text += f"\n{indent}Осталось {count} шт.\n"
         booked = db.how_many_stuff_booked(tg_id, stuff_id)
         if booked:
