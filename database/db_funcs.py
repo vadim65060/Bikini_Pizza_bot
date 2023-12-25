@@ -687,12 +687,16 @@ class DataBase:
         self.execute("DELETE FROM purchases WHERE tg_id = ?", user_id)
         if balls is None:
             balls = 0
-        self.execute("UPDATE users SET money = money - ? + ? WHERE tg_id = ?", balls,
-                     int(price * constants.CASHBACK_PERCENT), user_id, commit=True)
+        self.execute("UPDATE users SET money = money - ? WHERE tg_id = ?", balls, user_id, commit=True)
         order_id, = self.execute('SELECT MAX(id) FROM orders WHERE user_id = ?', user_id, fetch='ONE')
         self.execute('INSERT INTO orders_identifiers (order_id, telegram_payment, provider_payment) VALUES (?, ?, ?)',
                      order_id, telegram_payment, provider_payment, commit=True)
         return order_id
+
+    def give_cashback(self, order_id: int):
+        price, user_id, = self.execute('SELECT price, user_id FROM orders WHERE id = ?', order_id, fetch='ONE')
+        self.execute("UPDATE users SET money = money + ? WHERE tg_id = ?",
+                     int(price * constants.CASHBACK_PERCENT), user_id, commit=True)
 
     def get_last_user_order(self, user_id: int, what: str):
         order = self.execute(f"SELECT {what} FROM orders WHERE user_id = ?", user_id, fetch=True)

@@ -36,10 +36,12 @@ async def delivery_order(callback_data: dict):
 
 async def delivered_order(callback_data: dict):
     await users_bot.send_message(callback_data['user_id'], order_escort_texts.ORDER_DELIVERED_USER_TEXT)
+    db.give_cashback(callback_data['order_id'])
 
 
 async def issue_order(callback_data: dict):
     await users_bot.send_message(callback_data['user_id'], order_escort_texts.ORDER_ISSUED_USER_TEXT)
+    db.give_cashback(callback_data['order_id'])
 
 
 @admins.check(level=1)
