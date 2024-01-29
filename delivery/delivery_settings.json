@@ -2,48 +2,40 @@
   "delivery_settings": [
     {
       "delivery_price": 100,
-      "max_paid_delivery_price": 700,
-      "min_price": 500,
-      "zones": [
-        0,
-        1
-      ]
-    },
-    {
-      "delivery_price": 150,
-      "max_paid_delivery_price": 1200,
+      "max_paid_delivery_price": 1000,
       "min_price": 800,
       "zones": [
-        2,
-        3,
-        4
+        0,
+        1,
+        8
       ]
     },
     {
       "delivery_price": 150,
       "max_paid_delivery_price": 1500,
-      "min_price": 1000,
+      "min_price": 800,
       "zones": [
-        5,
+        2,
+        3,
+        9
+      ]
+    },
+    {
+      "delivery_price": 200,
+      "max_paid_delivery_price": 2000,
+      "min_price": 1500,
+      "zones": [
+        4,
         6,
         7
       ]
     },
     {
       "delivery_price": 250,
-      "max_paid_delivery_price": 2000,
-      "min_price": 1200,
+      "max_paid_delivery_price": 2200,
+      "min_price": 1800,
       "zones": [
-        8
-      ]
-    },
-    {
-      "delivery_price": 350,
-      "max_paid_delivery_price": 3000,
-      "min_price": 2500,
-      "zones": [
-        9,
-        10
+        5
       ]
     }
   ]
