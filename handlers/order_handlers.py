@@ -103,10 +103,17 @@ async def set_pickup_address(callback: CallbackQuery, state: FSMContext, callbac
 
 async def off_pickup(callback: CallbackQuery, state: FSMContext):
     await state.update_data({'pickup_address': None})
+    if not constants.ALLOW_BALLS_FOR_DELIVERY:
+        await state.update_data({'balls': None})
     await get_address(callback)
 
 
-async def select_balls_to_use(callback: CallbackQuery):
+async def select_balls_to_use(callback: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    pickup_address = data.get('pickup_address')
+    if not constants.ALLOW_BALLS_FOR_DELIVERY and pickup_address is None:
+        await callback.message.answer(order_texts.BALLS_BLOCK_TEXT)
+        return
     price = db.get_order_sum(callback.from_user.id)
     user_balance, = db.get_user_info(callback.from_user.id, 'money')
     balls_limit = max(0,

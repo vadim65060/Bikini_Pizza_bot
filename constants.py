@@ -4,13 +4,11 @@ from middleware.functions import dt_to_dtdict, dtdict_to_str, ACCUSATIVE_TIME_UN
 
 import pytz
 
-MAX_FULLNAME_LEN = 300
 TZ = pytz.timezone("Europe/Moscow")
 DATETIME_FORMAT = "%d.%m.%Y %H.%M"
 LOG_DATETIME_FORMAT = "%d.%m.%Y %H.%M.%S"
 SUPPORT_TIMEDELTA = dt.timedelta(minutes=120)
 SUPPORT_TIMEDELTA_ACCUSATIVE_STR = dtdict_to_str(dt_to_dtdict(SUPPORT_TIMEDELTA), ACCUSATIVE_TIME_UNITS_FORMS)
-PREVIOUS_REGISTERED_BOT_REWARD = 150
 LETTERING_PERIOD = 0.5
 
 ADMIN_BOT_NAME = 'AdminBot'
@@ -30,6 +28,7 @@ MAX_TIPS = 50000
 BALLS_USING_LIMIT_PERCENT = 0.3
 CASHBACK_PERCENT = 0.07
 PROVIDER_MIN_PRICE = 60
+ALLOW_BALLS_FOR_DELIVERY = False
 
 BLOCK_DELIVERY = False
 
