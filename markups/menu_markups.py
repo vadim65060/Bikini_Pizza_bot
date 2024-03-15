@@ -11,7 +11,7 @@ CANCEL_BUTTON = KeyboardButton(menu_texts.CANCEL_TEXT)
 
 menu_markup = ReplyKeyboardMarkup(resize_keyboard=True)
 menu_markup.add(menu_texts.MENU_STORE_BUTTON_TEXT, menu_texts.MENU_PROFILE_BUTTON_TEXT)
-menu_markup.add(menu_texts.MENU_PROMO_BUTTON_TEXT, menu_texts.MENU_HELP_BUTTON_TEXT)
+menu_markup.add(menu_texts.MENU_PROMO_BUTTON_TEXT, menu_texts.MENU_PROMOTIONS_BUTTON_TEXT, menu_texts.MENU_HELP_BUTTON_TEXT)
 
 help_markup = ReplyKeyboardMarkup(resize_keyboard=True).add(menu_texts.HELP_BUTTON_TEXT).add(
     menu_texts.BACK_BUTTON_TEXT)

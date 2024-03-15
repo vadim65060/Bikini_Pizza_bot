@@ -72,6 +72,11 @@ async def show_help(message: types.Message):
                          disable_web_page_preview=True)
 
 
+async def show_promotions(message: types.Message):
+    await message.answer(menu_texts.MENU_PROMOTIONS_TEXT,
+                         parse_mode=ParseMode.HTML)
+
+
 async def support_input(message: types.Message):
     await message.answer(menu_texts.HELP_INPUT_REQUEST,
                          reply_markup=ReplyKeyboardMarkup(
@@ -226,10 +231,13 @@ def register_menu_handlers():
                                 commands=['start'])
     dp.register_message_handler(show_profile,
                                 text=menu_texts.MENU_PROFILE_BUTTON_TEXT,
-                                state="*", )
+                                state="*")
     dp.register_message_handler(show_help,
                                 text=menu_texts.MENU_HELP_BUTTON_TEXT,
-                                state="*", )
+                                state="*")
+    dp.register_message_handler(show_promotions,
+                                text=menu_texts.MENU_PROMOTIONS_BUTTON_TEXT,
+                                state="*")
     dp.register_message_handler(support_input,
                                 text=menu_texts.HELP_BUTTON_TEXT,
                                 state=None)
@@ -240,18 +248,15 @@ def register_menu_handlers():
                                 text=menu_texts.BACK_BUTTON_TEXT,
                                 state=None)
     dp.register_message_handler(support_sent,
-                                state=menu_fsm.SupportState.input_wait
-                                )
+                                state=menu_fsm.SupportState.input_wait)
     dp.register_message_handler(cancel,
                                 text=menu_texts.CANCEL_TEXT,
-                                state=menu_fsm.PromoState.input_wait,
-                                )
+                                state=menu_fsm.PromoState.input_wait)
     dp.register_message_handler(promo_respond,
                                 state=None,
                                 text=menu_texts.MENU_PROMO_BUTTON_TEXT)
     dp.register_message_handler(promo_input,
-                                state=menu_fsm.PromoState.input_wait
-                                )
+                                state=menu_fsm.PromoState.input_wait)
     dp.register_message_handler(show_shop_temp_message,
                                 state=None,
                                 text=menu_texts.MENU_STORE_BUTTON_TEXT)
