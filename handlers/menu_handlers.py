@@ -3,6 +3,7 @@ import datetime as dt
 from io import BytesIO
 from typing import Union
 
+import aiogram
 import qrcode
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -205,10 +206,33 @@ async def lettering_start_lettering(message, state: FSMContext):
     await state.finish()
 
 
+@admins.check(level=3)
+async def send_message(message: types.Message):
+    args = message.text.split()
+    if len(args) < 3:
+        await message.answer(f'Не корректная команда: "{message.text}"\n'
+                             f'формат: "/m [userid] [message]"')
+        return
+
+    user = data_base.get_user_info(args[1], 'tg_id')
+    if user is None:
+        await message.answer(f'пользователь {args[1]} не найден')
+        return
+
+    text_start = message.text.find(args[2])
+    text = message.text[text_start:]
+    try:
+        await message.bot.send_message(args[1], 'Сообщение от администратора:\n' + text)
+        await message.answer('Сообщение отправлено')
+    except aiogram.utils.exceptions.ChatNotFound:
+        await message.answer('Произошла ошибка: чат не найден, сообщение НЕ отправлено')
+
+
 def register_menu_handlers():
     dp.register_message_handler(set_orders_chat, commands=['orderschat'])
     dp.register_message_handler(set_support_chat, commands=['supportchat'])
     dp.register_message_handler(clear_markup, commands=['clear'])
+    dp.register_message_handler(send_message, commands=['m'])
     # Рассылка
     dp.register_message_handler(lettering_respond,
                                 text="Рассылка",
