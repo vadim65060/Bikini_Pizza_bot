@@ -103,8 +103,9 @@ async def support_sent(message: types.Message, state: FSMContext):
                              reply_markup=menu_markups.menu_markup)
     else:
         await users_bot.send_message(chat_id=config.support_chat_id,
-                                     text=menu_texts.TO_SUPPORT_MESSAGE_TEMPLATE.format(user.username, user.url,
-                                                                                        message.text))
+                                     text=menu_texts.TO_SUPPORT_MESSAGE_TEMPLATE.format(user.username, user.id,
+                                                                                        message.text),
+                                     parse_mode=ParseMode.HTML)
         await message.answer(menu_texts.HELP_MESSAGE_SENT,
                              reply_markup=menu_markups.menu_markup)
         data_base.add_transaction(constants.TransactionTypes.SUPPORT_REQUEST.value,

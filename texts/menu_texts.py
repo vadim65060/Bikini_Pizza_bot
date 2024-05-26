@@ -64,7 +64,7 @@ HELP_INPUT_REQUEST = "Введи свой вопрос"
 HELP_MESSAGE_SENT = "Запрос отправлен, возвращаю тебя в меню"
 BACK_TO_MENU_TEXT = "Хорошо, возвращаю тебя в меню"
 TO_SUPPORT_MESSAGE_TEMPLATE = "Пользователь: @{}\n" \
-                              "Ссылка: {}\n" \
+                              "userid: <code>{}</code>\n" \
                               "Вопрос:\n{}"
 
 PROMO_INPUT_REQUEST = "Если у тебя есть промокод, введи его сюда"
